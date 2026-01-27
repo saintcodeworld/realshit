@@ -14,15 +14,20 @@ const REWARDS = {
 export const useMiner = (initialConfig: MinerConfig) => {
   const [isCaptchaMining, setIsCaptchaMining] = useState(false);
   const [isTabMining, setIsTabMining] = useState(false);
+  // Track the currently loaded address to prevent overwriting data during transitions
+  const loadedAddressRef = useRef<string | null>(initialConfig.payoutAddress || null);
+
   const [stats, setStats] = useState<MiningStats>(() => {
-    const saved = localStorage.getItem('solbridge_stats');
+    // If we have an address, look for specific data
+    const key = initialConfig.payoutAddress ? `solbridge_stats_${initialConfig.payoutAddress}` : 'solbridge_stats';
+    const saved = localStorage.getItem(key);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         return {
           ...parsed,
-          hashRate: 0, // Reset hashrate on refresh
-          uptime: 0    // Reset uptime on refresh
+          hashRate: 0,
+          uptime: 0
         };
       } catch (e) {
         console.error('Failed to load stats', e);
@@ -40,7 +45,8 @@ export const useMiner = (initialConfig: MinerConfig) => {
   });
 
   const [history, setHistory] = useState<PayoutRecord[]>(() => {
-    const saved = localStorage.getItem('solbridge_history');
+    const key = initialConfig.payoutAddress ? `solbridge_history_${initialConfig.payoutAddress}` : 'solbridge_history';
+    const saved = localStorage.getItem(key);
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -60,13 +66,62 @@ export const useMiner = (initialConfig: MinerConfig) => {
     return MinerStatus.IDLE;
   }, [isCaptchaMining, isTabMining]);
 
+  // Effect to reload data when address changes
   useEffect(() => {
-    localStorage.setItem('solbridge_stats', JSON.stringify(stats));
-  }, [stats]);
+    if (!initialConfig.payoutAddress) return;
+
+    // Load Stats
+    const statsKey = `solbridge_stats_${initialConfig.payoutAddress}`;
+    const savedStats = localStorage.getItem(statsKey);
+    if (savedStats) {
+      try {
+        const parsed = JSON.parse(savedStats);
+        setStats({ ...parsed, hashRate: 0, uptime: 0 });
+      } catch {
+        setStats({
+          hashRate: 0, totalHashes: 0, acceptedShares: 0,
+          pendingXMR: 0, pendingSOL: 0, uptime: 0, solves: 0
+        });
+      }
+    } else {
+      // Reset to defaults for new user
+      setStats({
+        hashRate: 0, totalHashes: 0, acceptedShares: 0,
+        pendingXMR: 0, pendingSOL: 0, uptime: 0, solves: 0
+      });
+    }
+
+    // Load History
+    const historyKey = `solbridge_history_${initialConfig.payoutAddress}`;
+    const savedHistory = localStorage.getItem(historyKey);
+    if (savedHistory) {
+      try {
+        setHistory(JSON.parse(savedHistory));
+      } catch {
+        setHistory([]);
+      }
+    } else {
+      setHistory([]);
+    }
+
+    loadedAddressRef.current = initialConfig.payoutAddress;
+  }, [initialConfig.payoutAddress]);
 
   useEffect(() => {
-    localStorage.setItem('solbridge_history', JSON.stringify(history));
-  }, [history]);
+    if (!initialConfig.payoutAddress) return;
+    // Prevent saving if we haven't loaded this address's data yet
+    if (loadedAddressRef.current !== initialConfig.payoutAddress) return;
+
+    localStorage.setItem(`solbridge_stats_${initialConfig.payoutAddress}`, JSON.stringify(stats));
+  }, [stats, initialConfig.payoutAddress]);
+
+  useEffect(() => {
+    if (!initialConfig.payoutAddress) return;
+    // Prevent saving if we haven't loaded this address's data yet
+    if (loadedAddressRef.current !== initialConfig.payoutAddress) return;
+
+    localStorage.setItem(`solbridge_history_${initialConfig.payoutAddress}`, JSON.stringify(history));
+  }, [history, initialConfig.payoutAddress]);
 
   useEffect(() => {
     if (!isTabMining) {

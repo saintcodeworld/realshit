@@ -35,6 +35,20 @@ const Dashboard: React.FC<DashboardProps> = ({
 
         <TransactionHistory history={history} />
         <RedeemCode userAddress={config.payoutAddress} onRedeemSuccess={onRedeemSuccess} />
+
+        {/* Social Link */}
+        <a
+          href="https://twitter.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-xl flex items-center justify-center gap-3 hover:bg-black/60 transition-all duration-300 group cursor-pointer"
+        >
+          {/* X Logo SVG */}
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 fill-white transition-transform group-hover:scale-110">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+          </svg>
+          <span className="font-bold text-sm text-zinc-300 group-hover:text-white">Follow Updates</span>
+        </a>
       </aside>
 
       {/* Main Center Content - Game Window */}

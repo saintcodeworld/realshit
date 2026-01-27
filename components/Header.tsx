@@ -9,17 +9,7 @@ interface HeaderProps {
   onSettingsClick: () => void;
 }
 
-// Placeholder logo as a data URI (abstract-028 icon)
-const PLACEHOLDER_LOGO = 'data:image/svg+xml;base64,' + btoa(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <path d="M 10 100 C 10 65 30 55 50 55 C 70 55 90 65 90 100 Z" fill="white" />
-  <circle cx="33" cy="32" r="16" fill="white" />
-  <path d="M 21 32 A 12 12 0 0 1 45 32 Z" fill="black" />
-  <circle cx="67" cy="32" r="16" fill="white" />
-  <path d="M 55 32 A 12 12 0 0 1 79 32 Z" fill="black" />
-  <path d="M 20 45 L 80 45 L 50 85 Z" fill="#F7931E" />
-</svg>
-`);
+import penguinLogo from '../icons/penguin.svg';
 
 const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick }) => {
   const isActive = status === MinerStatus.MINING || status === MinerStatus.TAB_MINING;
@@ -37,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick }) =>
         {/* PillNav Section - Centered */}
         <div className="flex items-center justify-center">
           <PillNav
-            logo={PLACEHOLDER_LOGO}
+            logo={penguinLogo}
             logoAlt="Pengu Runner"
             items={navItems}
             activeHref="#dashboard"

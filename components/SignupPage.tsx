@@ -4,6 +4,8 @@ import LightRays from './LightRays';
 import SignInModal from './SignInModal';
 import { generateSolanaWallet, saveWalletToStorage, WalletData } from '../utils/solanaWallet';
 
+import penguinLogo from '../icons/penguin.svg';
+
 interface SignupPageProps {
     onWalletGenerated: (wallet: WalletData) => void;
 }
@@ -15,7 +17,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
     const [copied, setCopied] = useState<'public' | 'private' | null>(null);
     const [hasBackedUp, setHasBackedUp] = useState(false);
     const [showSignInModal, setShowSignInModal] = useState(false);
-    const [copiedCA, setCopiedCA] = useState(false);
+
 
     const handleGenerateWallet = useCallback(async () => {
         setIsGenerating(true);
@@ -54,17 +56,12 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
         onWalletGenerated(wallet);
     }, [onWalletGenerated]);
 
-    const handleCopyCA = useCallback(async () => {
-        const caText = "12345678901234567890";
-        await navigator.clipboard.writeText(caText);
-        setCopiedCA(true);
-        setTimeout(() => setCopiedCA(false), 2000);
-    }, []);
+
 
     return (
         <div
             className="min-h-screen flex flex-col text-white selection:bg-purple-500/30 relative bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/pengu_bg.jpg')" }}
+            style={{ backgroundImage: "url('/dashboard_pixel_bg.png')" }}
         >
             {/* Animated DotGrid Background */}
             {/* LightRays Background */}
@@ -92,21 +89,14 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                     <div className="text-center max-w-lg">
                         {/* Logo/Brand */}
                         <div className="mb-8">
-                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[linear-gradient(145deg,#2e2d2d,#212121)] border border-[#404c5d] shadow-[-1px_-5px_15px_#41465b,5px_5px_15px_#41465b,inset_5px_5px_10px_#212121,inset_-5px_-5px_10px_#212121] mb-6">
-                                <svg className="w-10 h-10" viewBox="0 0 100 100" fill="none">
-                                    <path d="M 10 100 C 10 65 30 55 50 55 C 70 55 90 65 90 100 Z" fill="white" />
-                                    <circle cx="33" cy="32" r="16" fill="white" />
-                                    <path d="M 21 32 A 12 12 0 0 1 45 32 Z" fill="black" />
-                                    <circle cx="67" cy="32" r="16" fill="white" />
-                                    <path d="M 55 32 A 12 12 0 0 1 79 32 Z" fill="black" />
-                                    <path d="M 20 45 L 80 45 L 50 85 Z" fill="#F7931E" />
-                                </svg>
+                            <div className="mb-6 flex justify-center">
+                                <img src={penguinLogo} alt="Pengu Runner" className="w-24 h-24" />
                             </div>
                             <h1 className="text-4xl font-bold text-white mb-3">
                                 Pengu Runner
                             </h1>
                             <p className="text-white text-lg">
-                                Create your Solana wallet to start mining
+                                Create your solana wallet
                             </p>
                         </div>
 
@@ -145,27 +135,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                             Sign In
                         </button>
 
-                        {/* CA Button */}
-                        <button
-                            onClick={handleCopyCA}
-                            className="neo-btn neo-btn-secondary w-full"
-                        >
-                            {copiedCA ? (
-                                <>
-                                    <svg className="w-5 h-5 mr-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    CA Copied!
-                                </>
-                            ) : (
-                                <>
-                                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                    CA: 12345678901234567890
-                                </>
-                            )}
-                        </button>
+
                     </div>
                 ) : (
                     /* Wallet Generated State */

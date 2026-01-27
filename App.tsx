@@ -47,6 +47,8 @@ const App: React.FC = () => {
   const handleLogout = useCallback(() => {
     clearWalletFromStorage();
     setWallet(null);
+    // Reset config to avoid carrying over address to next session temporarily
+    setConfig(prev => ({ ...prev, payoutAddress: '' }));
   }, []);
 
   const {

@@ -241,8 +241,9 @@
   },
   {
     "code": "PENGU-2026-9EZB-RE39",
-    "redeemed": false,
-    "redeemedBy": null
+    "redeemed": true,
+    "redeemedBy": "5yzFX7o2Xu5Cb2EuFUJd6z3DZTFM7KFsdfauNPEJDXWj",
+    "redeemedAt": "2026-01-27T17:23:36.279Z"
   },
   {
     "code": "PENGU-2026-Q2JH-7KUK",
