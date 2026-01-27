@@ -33,15 +33,12 @@ const app = express();
 const httpServer = createServer(app);
 
 // Production-ready CORS
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(',')
-    : ["http://localhost:5173", "http://localhost:3000"];
+const allowedOrigins = "*";
 
 const io = new Server(httpServer, {
     cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"],
-        credentials: true
+        origin: "*", // Allow all for production debugging
+        methods: ["GET", "POST"]
     }
 });
 
