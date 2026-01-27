@@ -141,7 +141,7 @@ app.post('/api/withdraw', withdrawLimiter, async (req, res) => {
     }
 
     const { recipientAddress, amountSOL } = req.body;
-    const MIN_WITHDRAWAL = 0.15;
+    const MIN_WITHDRAWAL = 0.03;
     const MAX_WITHDRAWAL = 10;
 
     if (!recipientAddress || typeof recipientAddress !== 'string') {
