@@ -42,8 +42,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
     // Game State Refs (for Loop)
     const penguinRef = useRef({ x: 50, y: 0, dy: 0, grounded: true });
-    const lastBirdMilestoneRef = useRef(0);
-    const obstaclesRef = useRef<{ x: number; width: number; height: number; type: 'iceberg' | 'bird'; y: number }[]>([]);
+    const obstaclesRef = useRef<{ x: number; width: number; height: number; type: 'iceberg'; y: number }[]>([]);
     const scoreRef = useRef(0);
     const lastMilestoneRef = useRef(0);
     const speedRef = useRef(0);
@@ -76,7 +75,6 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
         obstaclesRef.current = [];
         scoreRef.current = 0;
         lastMilestoneRef.current = 0;
-        lastBirdMilestoneRef.current = 0;
         speedRef.current = configRef.current.speed;
         lastFrameTimeRef.current = performance.now(); // Reset time
         setScore(0);
@@ -192,8 +190,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             // Move Obstacles
             if (isPlaying) {
                 obstaclesRef.current.forEach(obs => {
-                    // Birds fly towards the player faster than the ground moves
-                    const moveSpeed = obs.type === 'bird' ? speedRef.current + 3 : speedRef.current;
+                    const moveSpeed = speedRef.current;
                     obs.x -= moveSpeed * dt; // Scale movement
                 });
                 if (obstaclesRef.current.length > 0 && obstaclesRef.current[0].x < -100) {
@@ -209,67 +206,41 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
                 const currentDistM = Math.floor(scoreRef.current / 50);
 
-                // Spawn Bird every 25m
-                const BIRD_INTERVAL = 25;
-                const nextBirdDist = lastBirdMilestoneRef.current + BIRD_INTERVAL;
 
-                if (currentDistM >= nextBirdDist) {
-                    lastBirdMilestoneRef.current = nextBirdDist;
+                // Normal Iceberg Spawning logic
+                const lastObs = obstaclesRef.current[obstaclesRef.current.length - 1];
 
-                    // Spawn a bird
-                    // Height: roughly 70px above ground to allow ducking (penguin is 30px) or jumping over (max jump ~120px)
-                    // If bird is at y = groundY - 70.
-                    // Penguin on ground: y = groundY - 30. Diff = 40px gap. Plenty to go under??
-                    // Wait, coordinates:
-                    // Ground = 290. Penguin Top = 260.
-                    // If bird is at y=220 (h=20). Bird Bottom = 240.
-                    // Gap between Bird Bottom (240) and Ground (290) is 50px. Penguin (30px) fits easily.
-                    // Penguin Hitbox is smaller (approx 20px). Easy under.
-                    // Jump: Max height ~120. Top of jump = 290 - 120 = 170.
-                    // Bird Top = 220. Jump clears it easily.
+                // Cap the gap so it doesn't get too wide at high speeds
+                // speed * 40 can reach 520+. Let's cap at 400.
+                const minGap = Math.min(speedRef.current * 35, 400);
+                const variance = Math.random() * 150;
 
+                // Failsafe: If no obstacles, force spawn immediately
+                const shouldSpawn = !lastObs || (width - lastObs.x > minGap + variance);
+
+                if (shouldSpawn) {
+                    const h = Math.floor(Math.random() * 25) + 30;
                     obstaclesRef.current.push({
                         x: width,
-                        width: 30, // Bird width
-                        height: 20, // Bird height
-                        type: 'bird',
-                        y: groundY - 75 // Flying height
+                        width: OBSTACLE_WIDTH,
+                        height: h,
+                        type: 'iceberg',
+                        y: groundY - h
                     });
-                } else {
-                    // Normal Iceberg Spawning logic
-                    const lastObs = obstaclesRef.current[obstaclesRef.current.length - 1];
 
-                    // Cap the gap so it doesn't get too wide at high speeds
-                    // speed * 40 can reach 520+. Let's cap at 400.
-                    const minGap = Math.min(speedRef.current * 35, 400);
-                    const variance = Math.random() * 150;
-
-                    // Failsafe: If no obstacles, force spawn immediately
-                    const shouldSpawn = !lastObs || (width - lastObs.x > minGap + variance);
-
-                    if (shouldSpawn) {
-                        const h = Math.floor(Math.random() * 25) + 30;
+                    // 20% chance for double iceberg (slightly increased challenge)
+                    if (Math.random() < 0.20) {
+                        // Only if space permits visually
                         obstaclesRef.current.push({
-                            x: width,
+                            x: width + OBSTACLE_WIDTH + 10, // tighter double
                             width: OBSTACLE_WIDTH,
-                            height: h,
+                            height: Math.floor(Math.random() * 15) + 25,
                             type: 'iceberg',
-                            y: groundY - h
+                            y: groundY - (Math.floor(Math.random() * 15) + 25)
                         });
-
-                        // 20% chance for double iceberg (slightly increased challenge)
-                        if (Math.random() < 0.20) {
-                            // Only if space permits visually
-                            obstaclesRef.current.push({
-                                x: width + OBSTACLE_WIDTH + 10, // tighter double
-                                width: OBSTACLE_WIDTH,
-                                height: Math.floor(Math.random() * 15) + 25,
-                                type: 'iceberg',
-                                y: groundY - (Math.floor(Math.random() * 15) + 25)
-                            });
-                        }
                     }
                 }
+
             }
 
             // Collision Detection
@@ -287,15 +258,8 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                     let ow = obs.width * 0.8;
                     let oh = obs.height;
 
-                    if (obs.type === 'bird') {
-                        ox = obs.x + 2;
-                        oy = obs.y + 2;
-                        ow = obs.width - 4;
-                        oh = obs.height - 4;
-                    } else {
-                        // Iceberg logic: obs.y is already top-left
-                        oy = obs.y;
-                    }
+                    // Iceberg logic: obs.y is already top-left
+                    oy = obs.y;
 
                     return (
                         px < ox + ow &&
@@ -403,47 +367,6 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                     ctx.moveTo(obs.width / 2, -obs.height);
                     ctx.lineTo(obs.width / 4, -obs.height / 2);
                     ctx.stroke();
-                    ctx.restore();
-                } else if (obs.type === 'bird') {
-                    // Draw 2D Bird model
-                    const t = Date.now() / 100;
-                    const wingOffset = Math.sin(t * 15) * 5; // Fast flap
-
-                    ctx.save();
-                    ctx.translate(obs.x, obs.y);
-
-                    // Body
-                    ctx.fillStyle = '#fca5a5'; // Reddish bird
-                    ctx.beginPath();
-                    ctx.ellipse(15, 10, 15, 8, 0, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Wing (Flapping)
-                    ctx.fillStyle = '#ef4444';
-                    ctx.beginPath();
-                    ctx.moveTo(10, 10);
-                    ctx.lineTo(5, 10 - 15 + wingOffset); // Wing tip moves
-                    ctx.lineTo(20, 10);
-                    ctx.fill();
-
-                    // Eye
-                    ctx.fillStyle = 'white';
-                    ctx.beginPath();
-                    ctx.arc(8, 8, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = 'black';
-                    ctx.beginPath();
-                    ctx.arc(7, 8, 1, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Beak
-                    ctx.fillStyle = '#f59e0b';
-                    ctx.beginPath();
-                    ctx.moveTo(2, 10);
-                    ctx.lineTo(-5, 12);
-                    ctx.lineTo(2, 14);
-                    ctx.fill();
-
                     ctx.restore();
                 }
             });
