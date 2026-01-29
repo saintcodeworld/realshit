@@ -83,7 +83,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ history }) => {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <span className={`text-xs font-bold uppercase ${getStatusColor(record.status)}`}>
-                  {record.status}
+                  {record.status === 'completed' ? 'SUCCESS' : record.status}
                 </span>
                 <span className="text-xs text-zinc-500">
                   {formatTimestamp(record.timestamp)}

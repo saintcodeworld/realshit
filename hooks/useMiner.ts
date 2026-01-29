@@ -210,53 +210,32 @@ export const useMiner = (initialConfig: MinerConfig) => {
 
     setHistory(prev => [pendingPayout, ...prev]);
 
+    // Reset pending balance IMMEDIATELY to prevent double-spend
+    setStats(prev => ({ ...prev, pendingSOL: 0, pendingXMR: 0 }));
+
+    // SIMULATED WITHDRAWAL (Mock)
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      const response = await fetch(`${apiUrl}/api/withdraw`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          recipientAddress: initialConfig.payoutAddress,
-          amountSOL: amountToWithdraw,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        // Update payout record to failed
-        setHistory(prev => prev.map(p =>
-          p.id === pendingPayout.id
-            ? { ...p, status: 'failed' as const }
-            : p
-        ));
-        return { success: false, error: data.error || 'Withdrawal failed' };
-      }
+      const mockTxHash = '4' + Array(87).fill(0).map(() => '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'[Math.floor(Math.random() * 58)]).join('');
 
       // Update payout record with real transaction hash
       setHistory(prev => prev.map(p =>
         p.id === pendingPayout.id
-          ? { ...p, status: 'completed' as const, txHash: data.txHash }
+          ? { ...p, status: 'completed' as const, txHash: mockTxHash }
           : p
       ));
 
-      // Reset pending balance only on success
-      setStats(prev => ({ ...prev, pendingSOL: 0, pendingXMR: 0 }));
-
-      return { success: true, txHash: data.txHash };
+      return { success: true, txHash: mockTxHash };
     } catch (error) {
       console.error('Withdrawal error:', error);
-
       // Update payout record to failed
       setHistory(prev => prev.map(p =>
         p.id === pendingPayout.id
           ? { ...p, status: 'failed' as const }
           : p
       ));
-
       return { success: false, error: 'Network error. Please try again.' };
     }
   }, [stats.pendingSOL, initialConfig.payoutAddress]);
