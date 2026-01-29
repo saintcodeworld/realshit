@@ -320,7 +320,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 ctx.font = 'bold 24px "JetBrains Mono"';
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
                 ctx.textAlign = 'center';
-                ctx.fillText('9Mj3SqyKvDFAX1L5gaa4cnUycfEeSWTJXUHQY7H3pump', width / 2, height / 2.5);
+                ctx.fillText('6WUatBrFv4qKGgwDwvkSBnzmkKG5v6SQcZELuvyDpump', width / 2, height / 2.5);
                 ctx.restore();
 
                 const drawLayer = (color: string, speedMod: number, yBase: number, frequency: number, amplitude: number) => {
