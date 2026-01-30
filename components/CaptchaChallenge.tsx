@@ -261,14 +261,28 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
                 if (shouldSpawn) {
                     const h = Math.floor(Math.random() * 30) + 35;
+                    const mainObsWidth = OBSTACLE_WIDTH + 15;
                     obstaclesRef.current.push({
                         x: width,
-                        width: OBSTACLE_WIDTH + 15,
+                        width: mainObsWidth,
                         height: h,
                         type: 'duststorm',
                         y: groundY - h,
                         warned: false
                     });
+
+                    // Add chance for "double" obstacle - requires "big jump"
+                    if (Math.random() < 0.2 && scoreRef.current > 300) { // 20% chance, only after some score
+                        const secondH = Math.floor(Math.random() * 30) + 35;
+                        obstaclesRef.current.push({
+                            x: width + mainObsWidth + 5, // Tiny 5px gap for "joined" look
+                            width: mainObsWidth,
+                            height: secondH,
+                            type: 'duststorm',
+                            y: groundY - secondH,
+                            warned: false
+                        });
+                    }
                 }
 
                 // Activate dust storm effect periodically
