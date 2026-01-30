@@ -62,6 +62,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
         {/* Social Link - Moved here */}
         <div
+          onClick={() => window.open('https://x.com/i/communities/2017054754161954960', '_blank')}
           className="bg-orange-600/20 backdrop-blur-xl border border-orange-500/30 rounded-2xl p-4 shadow-xl shadow-orange-500/10 flex items-center justify-center gap-3 hover:bg-orange-600/40 transition-all duration-300 group cursor-pointer w-full max-w-md mx-auto"
         >
           {/* X Logo SVG */}
