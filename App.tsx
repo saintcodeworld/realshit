@@ -82,12 +82,12 @@ const App: React.FC = () => {
 
   // Show dashboard if wallet exists
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white selection:bg-white/30 relative">
+    <div className="min-h-screen flex flex-col bg-[#0f0202] text-white selection:bg-red-500/30 relative">
       {/* Dashboard Background */}
       <div
         className="absolute inset-0 z-0"
         style={{
-          backgroundColor: '#000000',
+          backgroundColor: '#0f0202',
         }}
       />
 

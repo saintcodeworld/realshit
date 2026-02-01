@@ -92,7 +92,7 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
                                     onChange={(e) => setPrivateKey(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     placeholder="Enter your private key (Base58 format)"
-                                    className="w-full px-4 py-3 bg-zinc-800/50 rounded-xl text-orange-400 font-mono text-sm border border-zinc-700/50 placeholder:text-white focus:border-purple-500/50 focus:outline-none resize-none"
+                                    className="w-full px-4 py-3 bg-zinc-800/50 rounded-xl text-red-400 font-mono text-sm border border-zinc-700/50 placeholder:text-white focus:border-red-500/50 focus:outline-none resize-none"
                                     rows={3}
                                     type={showPrivateKey ? 'text' : 'password'}
                                 />
@@ -131,15 +131,15 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
                         )}
 
                         {/* Warning */}
-                        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 mb-6">
+                        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 mb-6">
                             <div className="flex gap-3">
-                                <svg className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                                 <div>
-                                    <p className="text-amber-400 font-medium mb-1">Security Notice</p>
-                                    <p className="text-amber-300/80 text-sm">
-                                        Make sure you're on the official Elon Runner website. Never enter your private key on untrusted sites.
+                                    <p className="text-red-400 font-medium mb-1">Security Notice</p>
+                                    <p className="text-red-300/80 text-sm">
+                                        Make sure you're on the official MOLT RUNNER website. Never enter your private key on untrusted sites.
                                     </p>
                                 </div>
                             </div>

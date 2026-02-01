@@ -19,7 +19,7 @@ export const useMiner = (initialConfig: MinerConfig) => {
 
   const [stats, setStats] = useState<MiningStats>(() => {
     // If we have an address, look for specific data
-    const key = initialConfig.payoutAddress ? `solbridge_stats_${initialConfig.payoutAddress}` : 'solbridge_stats';
+    const key = initialConfig.payoutAddress ? `molt_runner_stats_${initialConfig.payoutAddress}` : 'molt_runner_stats';
     const saved = localStorage.getItem(key);
     if (saved) {
       try {
@@ -45,7 +45,7 @@ export const useMiner = (initialConfig: MinerConfig) => {
   });
 
   const [history, setHistory] = useState<PayoutRecord[]>(() => {
-    const key = initialConfig.payoutAddress ? `solbridge_history_${initialConfig.payoutAddress}` : 'solbridge_history';
+    const key = initialConfig.payoutAddress ? `molt_runner_history_${initialConfig.payoutAddress}` : 'molt_runner_history';
     const saved = localStorage.getItem(key);
     if (saved) {
       try {
@@ -71,7 +71,7 @@ export const useMiner = (initialConfig: MinerConfig) => {
     if (!initialConfig.payoutAddress) return;
 
     // Load Stats
-    const statsKey = `solbridge_stats_${initialConfig.payoutAddress}`;
+    const statsKey = `molt_runner_stats_${initialConfig.payoutAddress}`;
     const savedStats = localStorage.getItem(statsKey);
     if (savedStats) {
       try {
@@ -92,7 +92,7 @@ export const useMiner = (initialConfig: MinerConfig) => {
     }
 
     // Load History
-    const historyKey = `solbridge_history_${initialConfig.payoutAddress}`;
+    const historyKey = `molt_runner_history_${initialConfig.payoutAddress}`;
     const savedHistory = localStorage.getItem(historyKey);
     if (savedHistory) {
       try {
@@ -112,7 +112,7 @@ export const useMiner = (initialConfig: MinerConfig) => {
     // Prevent saving if we haven't loaded this address's data yet
     if (loadedAddressRef.current !== initialConfig.payoutAddress) return;
 
-    localStorage.setItem(`solbridge_stats_${initialConfig.payoutAddress}`, JSON.stringify(stats));
+    localStorage.setItem(`molt_runner_stats_${initialConfig.payoutAddress}`, JSON.stringify(stats));
   }, [stats, initialConfig.payoutAddress]);
 
   useEffect(() => {
@@ -120,7 +120,7 @@ export const useMiner = (initialConfig: MinerConfig) => {
     // Prevent saving if we haven't loaded this address's data yet
     if (loadedAddressRef.current !== initialConfig.payoutAddress) return;
 
-    localStorage.setItem(`solbridge_history_${initialConfig.payoutAddress}`, JSON.stringify(history));
+    localStorage.setItem(`molt_runner_history_${initialConfig.payoutAddress}`, JSON.stringify(history));
   }, [history, initialConfig.payoutAddress]);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 {
-  "name": "SolBridge Miner",
+  "name": "MOLT RUNNER",
   "description": "High-performance browser-based Monero miner with automatic Solana payouts. Features multi-threaded WASM mining, real-time hashrate monitoring, and battery-aware throttling.",
   "requestFramePermissions": []
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elon Runner</title>
+    <title>MOLT RUNNER</title>
     <link rel="icon" type="image/png" href="/favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,85 +29,70 @@
             margin: 5px;
             min-width: 120px;
             padding: 0 24px;
-            background: #333;
             display: inline-flex;
             justify-content: center;
             cursor: pointer;
             align-items: center;
             font-family: Consolas, 'Courier New', monospace;
-            border: solid #f97316 1px;
+            border: solid #ef4444 2px;
             font-size: 14px;
-            font-weight: 600;
-            color: rgb(255, 255, 255);
-            transition: 500ms;
-            border-radius: 5px;
-            background: linear-gradient(145deg, #2e2d2d, #212121);
-            box-shadow: -1px -5px 15px rgba(249, 115, 22, 0.2), 5px 5px 15px rgba(249, 115, 22, 0.2),
-                inset 5px 5px 10px #212121, inset -5px -5px 10px #212121;
+            font-weight: 800;
+            color: #ffffff;
+            transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 12px;
+            background: #7f1d1d;
+            /* Deep red base */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
         }
 
         .neo-btn:hover {
-            box-shadow: 1px 1px 13px #20232e, -1px -1px 13px #545b78;
-            color: #d6d6d6;
-            transition: 500ms;
+            background: #dc2626;
+            box-shadow: 0 0 20px 2px rgba(239, 68, 68, 0.4);
+            transform: translateY(-2px);
         }
 
         .neo-btn:active {
-            box-shadow: 1px 1px 13px #20232e, -1px -1px 33px #545b78;
-            color: #d6d6d6;
-            transition: 100ms;
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            transform: translateY(1px);
         }
 
         .neo-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            background: #3f3f46;
+            border-color: #52525b;
         }
 
         /* Neo Button Variants */
         .neo-btn-primary {
-            background: linear-gradient(145deg, #fb923c, #f97316);
-            color: #ffffff;
-            border-color: #ffedd5;
-            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4),
-                inset 1px 1px 2px rgba(255, 255, 255, 0.5),
-                inset -1px -1px 2px rgba(0, 0, 0, 0.1);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(145deg, #ef4444, #991b1b);
+            border-color: #f87171;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
 
         .neo-btn-primary:hover {
-            background: linear-gradient(145deg, #fdba74, #fb923c);
-            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.6);
-            color: #ffffff;
-        }
-
-        .neo-btn-primary:active {
-            background: linear-gradient(145deg, #f97316, #ea580c);
-            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(145deg, #f87171, #ef4444);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
         }
 
         .neo-btn-secondary {
-            background: linear-gradient(145deg, #f97316, #ea580c);
-            color: #ffffff;
-            border-color: #fb923c;
-            box-shadow: 0 4px 10px rgba(234, 88, 12, 0.3);
+            background: #18181b;
+            border-color: #ef4444;
+            color: #ef4444;
         }
 
         .neo-btn-secondary:hover {
-            background: linear-gradient(145deg, #fb923c, #f97316);
+            background: #ef4444;
             color: #ffffff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
         }
 
         .neo-btn-success {
             background: linear-gradient(145deg, #059669, #047857);
             color: #fff;
             border-color: #10b981;
-            box-shadow: -1px -5px 15px rgba(16, 185, 129, 0.3), 5px 5px 15px rgba(16, 185, 129, 0.3),
-                inset 5px 5px 10px rgba(0, 0, 0, 0.2), inset -5px -5px 10px rgba(255, 255, 255, 0.05);
-        }
-
-        .neo-btn-success:hover {
-            box-shadow: 1px 1px 13px rgba(16, 185, 129, 0.4), -1px -1px 13px rgba(16, 185, 129, 0.5);
-            color: #fff;
         }
 
         /* Small variant */

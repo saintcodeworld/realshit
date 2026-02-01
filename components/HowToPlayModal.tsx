@@ -29,7 +29,7 @@ const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
                             <h3 className="text-lg font-bold uppercase">The Objective</h3>
                         </div>
                         <p className="text-zinc-300 leading-relaxed pl-4 text-sm">
-                            Run as far as you can with Elon! Avoid obstacles like icebergs.
+                            Run as far as you can with the character! Avoid obstacles like icebergs.
                             The further you run, the more <span className="text-cyan-400 font-bold">SOL</span> you earn.
                             Rewards are distributed automatically when you reach specific distance milestones.
                         </p>

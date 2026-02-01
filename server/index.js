@@ -1,5 +1,5 @@
 /**
- * SolBridge Miner - Backend API Server
+ * MOLT RUNNER - Backend API Server
  * Handles real Solana mainnet withdrawals from treasury wallet
  * And real-time live chat via WebSockets (Production Ready)
  */
@@ -339,7 +339,7 @@ io.on('connection', (socket) => {
 
 // Start server
 httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n🚀 SolBridge Miner API Server (Production Ready)`);
+    console.log(`\n🚀 MOLT RUNNER API Server (Production Ready)`);
     console.log(`   Running on http://0.0.0.0:${PORT}`);
     if (treasuryKeypair) {
         console.log(`   Treasury: ${treasuryKeypair.publicKey.toBase58()}`);

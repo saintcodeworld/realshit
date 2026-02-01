@@ -16,9 +16,9 @@ const GAME_CONFIG = {
     [CaptchaDifficulty.HARD]: { speed: 6, gravity: 0.7, jumpStrength: -12, gapMin: 100, gapMax: 220, winScore: 2000 },
 };
 
-const ELON_SIZE = 150;
-const OBSTACLE_WIDTH = 20;
-const OBSTACLE_HEIGHT = 40;
+const CHARACTER_SIZE = 120;
+const OBSTACLE_WIDTH = 25;
+const OBSTACLE_HEIGHT = 45;
 
 const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess, onStart, onMilestone, onGameOver, isMining }) => {
     const [difficulty, setDifficulty] = useState<CaptchaDifficulty>(CaptchaDifficulty.HARD);
@@ -41,8 +41,8 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
     const requestRef = useRef<number>();
 
     // Game State Refs (for Loop)
-    const elonRef = useRef({ x: 50, y: 0, dy: 0, grounded: true });
-    const elonSpriteRef = useRef<HTMLImageElement | null>(null);
+    const characterRef = useRef({ x: 50, y: 0, dy: 0, grounded: true });
+    const characterSpriteRef = useRef<HTMLImageElement | null>(null);
     const flagBgRef = useRef<HTMLImageElement | null>(null);
     const obstaclesRef = useRef<{ x: number; width: number; height: number; type: 'duststorm'; y: number; warned?: boolean }[]>([]);
     const scoreRef = useRef(0);
@@ -53,6 +53,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
     // Dust storm effect state
     const dustStormRef = useRef({ active: false, opacity: 0, particles: [] as { x: number; y: number; speed: number; size: number }[] });
     const lastDustSpawnRef = useRef(0);
+    const heartsRef = useRef<{ x: number; y: number; speed: number; size: number; opacity: number; phase: number }[]>([]);
 
     const startAudio = useRef<HTMLAudioElement | null>(null);
     const gameOverAudio = useRef<HTMLAudioElement | null>(null);
@@ -78,10 +79,10 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
         };
         (window as any).playWarningBeep = createBeep;
 
-        // Load Elon sprite
-        const elonImg = new Image();
-        elonImg.src = '/elon_sprite.png';
-        elonImg.onload = () => { elonSpriteRef.current = elonImg; };
+        // Load Character sprite
+        const charImg = new Image();
+        charImg.src = '/character.png';
+        charImg.onload = () => { characterSpriteRef.current = charImg; };
 
         // Load Mars background
         const marsImg = new Image();
@@ -99,6 +100,19 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             });
         }
         dustStormRef.current.particles = particles;
+        // Initialize heart particles
+        const hearts = [];
+        for (let i = 0; i < 40; i++) {
+            hearts.push({
+                x: Math.random() * 800,
+                y: Math.random() * 500,
+                speed: Math.random() * 0.8 + 0.4,
+                size: Math.random() * 15 + 10,
+                opacity: Math.random() * 0.4 + 0.2,
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+        heartsRef.current = hearts;
     }, []);
 
     const playSound = (audio: HTMLAudioElement | null) => {
@@ -114,7 +128,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
     const initGame = useCallback(() => {
         configRef.current = GAME_CONFIG[difficulty];
-        elonRef.current = { x: 50, y: 150 - ELON_SIZE, dy: 0, grounded: true };
+        characterRef.current = { x: 50, y: 150 - CHARACTER_SIZE, dy: 0, grounded: true };
         obstaclesRef.current = [];
         scoreRef.current = 0;
         lastMilestoneRef.current = 0;
@@ -140,7 +154,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             if (gameState !== 'VICTORY') initGame();
             return;
         }
-        const p = elonRef.current;
+        const p = characterRef.current;
         if (p.grounded) {
             // Jump strength does NOT need dt scaling if applied instantaneously as velocity, 
             // but gravity handling usually implies consistent units. 
@@ -207,8 +221,8 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 }
             }
 
-            // Update Elon
-            const p = elonRef.current;
+            // Update Character
+            const p = characterRef.current;
             if (isPlaying) {
                 // Variable Gravity
                 const isHoldingJump = keysPressed.current['Space'] || keysPressed.current['ArrowUp'];
@@ -218,13 +232,13 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 p.y += p.dy * dt;     // Scale velocity application
 
                 // Ground Collision
-                if (p.y + ELON_SIZE >= groundY) {
-                    p.y = groundY - ELON_SIZE;
+                if (p.y + CHARACTER_SIZE >= groundY) {
+                    p.y = groundY - CHARACTER_SIZE;
                     p.dy = 0;
                     p.grounded = true;
                 }
             } else if (gameState === 'IDLE') {
-                p.y = groundY - ELON_SIZE;
+                p.y = groundY - CHARACTER_SIZE;
                 p.dy = 0;
                 p.grounded = true;
             }
@@ -285,15 +299,6 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                     }
                 }
 
-                // Activate dust storm effect periodically
-                if (scoreRef.current - lastDustSpawnRef.current > 800) {
-                    dustStormRef.current.active = true;
-                    lastDustSpawnRef.current = scoreRef.current;
-                    setTimeout(() => {
-                        dustStormRef.current.active = false;
-                    }, 3000);
-                }
-
                 // Warning beep system - Neuralink audio cue
                 obstaclesRef.current.forEach(obs => {
                     // Play warning beep when obstacle is 250-300 pixels away
@@ -309,12 +314,12 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
             // Collision Detection
             if (isPlaying) {
-                const hitMargin = ELON_SIZE * 0.2; // 20% forgiveness
+                const hitMargin = CHARACTER_SIZE * 0.2; // 20% forgiveness
                 const crash = obstaclesRef.current.some(obs => {
                     const px = p.x + hitMargin;
                     const py = p.y + hitMargin;
-                    const pw = ELON_SIZE - (hitMargin * 2);
-                    const ph = ELON_SIZE - (hitMargin * 2);
+                    const pw = CHARACTER_SIZE - (hitMargin * 2);
+                    const ph = CHARACTER_SIZE - (hitMargin * 2);
 
                     // Obstacle Hitbox
                     let ox = obs.x + (obs.width * 0.1);
@@ -373,23 +378,46 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
             // Drawing
             const drawBackground = () => {
-                // Black background
-                ctx.fillStyle = '#000000';
+                // Red background gradient
+                const backgroundGradient = ctx.createLinearGradient(0, 0, 0, height);
+                backgroundGradient.addColorStop(0, '#991b1b'); // deep red
+                backgroundGradient.addColorStop(1, '#450a0a'); // even deeper red
+                ctx.fillStyle = backgroundGradient;
                 ctx.fillRect(0, 0, width, height);
 
-                // Draw Mars background if loaded - covers entire canvas
-                if (flagBgRef.current) {
-                    ctx.globalAlpha = 0.8;
-                    // Source image is 1024x1024 but contains two 1024x512 images.
-                    // We crop the top half (0, 0, 1024, 512) and draw it to cover the whole canvas.
-                    ctx.drawImage(flagBgRef.current, 0, 0, 1024, 512, 0, 0, width, height);
-                    ctx.globalAlpha = 1.0;
-                }
+                // Draw Floating Hearts
+                heartsRef.current.forEach(heart => {
+                    heart.y -= heart.speed * dt;
+                    heart.x += Math.sin(heart.phase + Date.now() / 1000) * 0.5 * dt;
+
+                    if (heart.y < -heart.size) {
+                        heart.y = height + heart.size;
+                        heart.x = Math.random() * width;
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = heart.opacity;
+                    ctx.fillStyle = '#ef4444'; // Bright red heart
+                    ctx.translate(heart.x, heart.y);
+
+                    const s = heart.size;
+                    const scale = 1 + Math.sin(heart.phase + Date.now() / 500) * 0.1; // Pulsing effect
+                    ctx.scale(scale, scale);
+
+                    ctx.beginPath();
+                    ctx.moveTo(0, s * 0.3);
+                    ctx.bezierCurveTo(0, 0, -s * 0.5, 0, -s * 0.5, s * 0.3);
+                    ctx.bezierCurveTo(-s * 0.5, s * 0.6, 0, s * 0.8, 0, s);
+                    ctx.bezierCurveTo(0, s * 0.8, s * 0.5, s * 0.6, s * 0.5, s * 0.3);
+                    ctx.bezierCurveTo(s * 0.5, 0, 0, 0, 0, s * 0.3);
+                    ctx.fill();
+                    ctx.restore();
+                });
 
                 // Draw background text
                 ctx.save();
                 ctx.font = 'bold 22px "JetBrains Mono"';
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'; // Slightly lower opacity for center placement
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; // Lowered opacity for text
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('DNcL78G1neLkW3gw3dWYhqF6WmyHGdhTUkKsvuekpump', width / 2, height / 2);
@@ -402,17 +430,16 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             ctx.fillStyle = '#3d1a10'; // Dark reddish brown
             ctx.fillRect(0, groundY, width, 10);
 
-            // Draw Dust Storm Obstacles (hidden rocks in the storm)
+            // Draw Obstacles
             obstaclesRef.current.forEach(obs => {
                 if (obs.type === 'duststorm') {
                     ctx.save();
                     ctx.translate(obs.x, groundY);
 
-                    // Draw the hidden rock/debris - Mars red colors
+                    // Draw white obstacles
                     const rockGradient = ctx.createLinearGradient(0, -obs.height, 0, 0);
-                    rockGradient.addColorStop(0, '#8B4513'); // Saddle brown
-                    rockGradient.addColorStop(0.5, '#CD853F'); // Peru
-                    rockGradient.addColorStop(1, '#A0522D'); // Sienna
+                    rockGradient.addColorStop(0, '#ffffff'); // Pure white
+                    rockGradient.addColorStop(1, '#cccccc'); // Light grey
                     ctx.fillStyle = rockGradient;
 
                     // Jagged rock shape
@@ -425,92 +452,37 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                     ctx.closePath();
                     ctx.fill();
 
-                    // Add some texture/detail
-                    ctx.strokeStyle = '#654321';
+                    // Optional: Inner detail for the rock
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
                     ctx.lineWidth = 1;
                     ctx.beginPath();
-                    ctx.moveTo(obs.width * 0.3, -obs.height * 0.4);
-                    ctx.lineTo(obs.width * 0.5, -obs.height * 0.8);
+                    ctx.moveTo(obs.width * 0.3, -obs.height * 0.3);
+                    ctx.lineTo(obs.width * 0.5, -obs.height * 0.7);
                     ctx.stroke();
+
                     ctx.restore();
                 }
             });
 
-            // Draw Mars Dust Storm overlay effect
-            if (dustStormRef.current.active || dustStormRef.current.opacity > 0) {
-                // Fade in/out
-                if (dustStormRef.current.active && dustStormRef.current.opacity < 0.7) {
-                    dustStormRef.current.opacity += 0.02;
-                } else if (!dustStormRef.current.active && dustStormRef.current.opacity > 0) {
-                    dustStormRef.current.opacity -= 0.02;
-                }
-
-                // Draw orange-red dust overlay
-                ctx.fillStyle = `rgba(205, 92, 0, ${dustStormRef.current.opacity * 0.6})`;
-                ctx.fillRect(0, 0, width, height);
-
-                // Draw swirling dust particles
-                dustStormRef.current.particles.forEach(particle => {
-                    particle.x -= particle.speed * 2;
-                    if (particle.x < 0) {
-                        particle.x = width;
-                        particle.y = Math.random() * height;
-                    }
-
-                    ctx.beginPath();
-                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(210, 105, 30, ${dustStormRef.current.opacity})`;
-                    ctx.fill();
-                });
-
-                // Add "DUST STORM!" warning text
-                if (dustStormRef.current.opacity > 0.3) {
-                    ctx.font = 'bold 24px "JetBrains Mono"';
-                    ctx.fillStyle = `rgba(255, 100, 50, ${Math.sin(Date.now() / 200) * 0.5 + 0.5})`;
-                    ctx.textAlign = 'center';
-                    ctx.fillText('⚠ DUST STORM - LISTEN FOR NEURALINK ⚠', width / 2, 50);
-                }
-            }
-
-            // Draw Elon (using sprite image)
-            const drawElon = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
-                const t = Date.now() / 150;
-                const isJumping = !elonRef.current.grounded;
-                const rotation = isJumping ? Math.sin(t) * 0.1 : 0;
-                const bob = isJumping ? 0 : Math.sin(t) * 3;
-
-                // Stretch and squash factor
-                let stretchX = 1;
-                let stretchY = 1;
-
-                if (isJumping) {
-                    // Stretch when flying up/down
-                    const velocityFactor = Math.abs(elonRef.current.dy) * 0.02;
-                    stretchX = 1 - velocityFactor;
-                    stretchY = 1 + velocityFactor;
-                } else {
-                    // Subtle breathing/idling squash
-                    stretchX = 1 + Math.sin(t) * 0.02;
-                    stretchY = 1 - Math.sin(t) * 0.02;
-                }
+            // Draw Character (using sprite image)
+            const drawCharacter = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
+                const isJumping = !characterRef.current.grounded;
 
                 ctx.save();
-                ctx.translate(x + size / 2, y + size / 2 + bob);
-                ctx.rotate(rotation);
-                ctx.scale(stretchX, stretchY); // Cartoon stretch
+                ctx.translate(x + size / 2, y + size / 2);
                 ctx.translate(-size / 2, -size / 2);
 
                 // Draw shadow if grounded
                 if (!isJumping) {
                     ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
                     ctx.beginPath();
-                    ctx.ellipse(size * 0.5, size * 0.95, (size * 0.4) * stretchX, (size * 0.08) * stretchY, 0, 0, Math.PI * 2);
+                    ctx.ellipse(size * 0.5, size * 0.95, size * 0.4, size * 0.08, 0, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                // Draw Elon sprite if loaded, fallback to simple shape
-                if (elonSpriteRef.current) {
-                    ctx.drawImage(elonSpriteRef.current, 0, 0, size, size);
+                // Draw Character sprite if loaded, fallback to simple shape
+                if (characterSpriteRef.current) {
+                    ctx.drawImage(characterSpriteRef.current, 0, 0, size, size);
                 } else {
                     // Fallback: simple silhouette
                     ctx.fillStyle = '#1e40af';
@@ -523,7 +495,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 ctx.restore();
             };
 
-            drawElon(ctx, p.x, p.y, ELON_SIZE);
+            drawCharacter(ctx, p.x, p.y, CHARACTER_SIZE);
 
             // Overlays
             if (gameState === 'IDLE') {
@@ -540,17 +512,17 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
                 ctx.fillRect(btnX + 4, btnY + 4, btnW, btnH);
 
-                // Button Background (White)
-                ctx.fillStyle = '#ffffff';
+                // Button Background (Red)
+                ctx.fillStyle = '#ef4444';
                 ctx.fillRect(btnX, btnY, btnW, btnH);
 
-                // Button Outline (White)
-                ctx.strokeStyle = '#ffffff';
+                // Button Outline (Light Red)
+                ctx.strokeStyle = '#f87171';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(btnX, btnY, btnW, btnH);
 
                 ctx.font = 'bold 16px "JetBrains Mono"';
-                ctx.fillStyle = '#000000'; // Black text for contrast on white button
+                ctx.fillStyle = '#ffffff'; // White text
                 ctx.textAlign = 'center';
                 ctx.fillText('START GAME', width / 2, height / 2 + 6);
             } else if (gameState === 'GAME_OVER') {

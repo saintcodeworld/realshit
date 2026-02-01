@@ -10,7 +10,7 @@ interface HeaderProps {
   onHowToPlayClick: () => void;
 }
 
-import elonLogo from '../icons/elon.png';
+import mainLogo from '../icons/elon.png';
 
 const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick, onHowToPlayClick }) => {
   const isActive = status === MinerStatus.MINING || status === MinerStatus.TAB_MINING;
@@ -28,8 +28,8 @@ const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick, onHo
         {/* PillNav Section - Centered */}
         <div className="flex items-center justify-center">
           <PillNav
-            logo={elonLogo}
-            logoAlt="Elon Runner"
+            logo={mainLogo}
+            logoAlt="MOLT RUNNER"
             items={navItems}
             activeHref="#dashboard"
             baseColor="linear-gradient(145deg, #2e2d2d, #212121)"

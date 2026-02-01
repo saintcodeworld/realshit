@@ -63,7 +63,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         {/* Social Link - Moved here */}
         <div
           onClick={() => window.open('https://x.com/i/communities/2017054754161954960', '_blank')}
-          className="bg-orange-600/20 backdrop-blur-xl border border-orange-500/30 rounded-2xl p-4 shadow-xl shadow-orange-500/10 flex items-center justify-center gap-3 hover:bg-orange-600/40 transition-all duration-300 group cursor-pointer w-full max-w-md mx-auto"
+          className="bg-red-600/20 backdrop-blur-xl border border-red-500/30 rounded-2xl p-4 shadow-xl shadow-red-500/10 flex items-center justify-center gap-3 hover:bg-red-600/40 transition-all duration-300 group cursor-pointer w-full max-w-md mx-auto"
         >
           {/* X Logo SVG */}
           <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 fill-white transition-transform group-hover:scale-110">
@@ -71,6 +71,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           </svg>
           <span className="font-bold text-sm text-zinc-300 group-hover:text-white">Follow Updates</span>
         </div>
+
       </main>
 
       {/* Right Sidebar - Withdrawal & Chat */}

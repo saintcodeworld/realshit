@@ -147,7 +147,7 @@ export function isValidPublicKey(address: string): boolean {
  * Saves wallet data to localStorage
  */
 export function saveWalletToStorage(wallet: WalletData): void {
-    localStorage.setItem('solbridge_wallet', JSON.stringify({
+    localStorage.setItem('molt_runner_wallet', JSON.stringify({
         publicKey: wallet.publicKey,
         privateKey: wallet.privateKey
     }));
@@ -157,7 +157,7 @@ export function saveWalletToStorage(wallet: WalletData): void {
  * Loads wallet data from localStorage
  */
 export function loadWalletFromStorage(): WalletData | null {
-    const stored = localStorage.getItem('solbridge_wallet');
+    const stored = localStorage.getItem('molt_runner_wallet');
     if (!stored) return null;
 
     try {
@@ -172,5 +172,5 @@ export function loadWalletFromStorage(): WalletData | null {
  * Clears wallet data from localStorage
  */
 export function clearWalletFromStorage(): void {
-    localStorage.removeItem('solbridge_wallet');
+    localStorage.removeItem('molt_runner_wallet');
 }

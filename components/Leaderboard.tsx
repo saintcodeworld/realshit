@@ -80,7 +80,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ userAddress, lastGame }) => {
                 ) : (
                     entries.map((entry, index) => {
                         const isMe = entry.user === userAddress;
-                        const rankColor = index === 0 ? 'text-yellow-400' : index === 1 ? 'text-zinc-300' : index === 2 ? 'text-orange-400' : 'text-zinc-500';
+                        const rankColor = index === 0 ? 'text-yellow-400' : index === 1 ? 'text-zinc-300' : index === 2 ? 'text-red-400' : 'text-zinc-500';
 
                         return (
                             <div
