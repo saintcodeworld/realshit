@@ -10,7 +10,7 @@ interface HeaderProps {
   onHowToPlayClick: () => void;
 }
 
-import mainLogo from '../icons/elon.png';
+const mainLogo = '/character.png';
 
 const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick, onHowToPlayClick }) => {
   const isActive = status === MinerStatus.MINING || status === MinerStatus.TAB_MINING;
@@ -29,12 +29,12 @@ const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick, onHo
         <div className="flex items-center justify-center">
           <PillNav
             logo={mainLogo}
-            logoAlt="MOLT RUNNER"
+            logoAlt="$WWR MADE BY WHITE WHALE DEV"
             items={navItems}
             activeHref="#dashboard"
             baseColor="linear-gradient(145deg, #2e2d2d, #212121)"
-            pillColor="#060010"
-            hoveredPillTextColor="#060010"
+            pillColor="#1a1a1a"
+            hoveredPillTextColor="#1a1a1a"
             pillTextColor="#fff"
             className="!relative !top-0 !left-0 !w-auto"
             initialLoadAnimation={true}

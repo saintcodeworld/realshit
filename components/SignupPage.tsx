@@ -4,7 +4,7 @@ import LightRays from './LightRays';
 import SignInModal from './SignInModal';
 import { generateSolanaWallet, saveWalletToStorage, WalletData } from '../utils/solanaWallet';
 
-import mainLogo from '../icons/elon.png';
+const mainLogo = '/character.png';
 
 interface SignupPageProps {
     onWalletGenerated: (wallet: WalletData) => void;
@@ -68,7 +68,7 @@ const FloatingMoltModels: React.FC = () => {
                 if (modelImage.complete) {
                     ctx.drawImage(modelImage, -model.size / 2, -model.size / 2, model.size, model.size);
                 } else {
-                    ctx.fillStyle = '#ef4444';
+                    ctx.fillStyle = '#1a1a1a';
                     ctx.beginPath();
                     ctx.arc(0, 0, model.size / 3, 0, Math.PI * 2);
                     ctx.fill();
@@ -147,13 +147,13 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
 
     return (
         <div
-            className="min-h-screen flex flex-col text-white selection:bg-red-500/30 relative overflow-hidden bg-black"
+            className="min-h-screen flex flex-col text-white selection:bg-zinc-500/30 relative overflow-hidden"
         >
             {/* Background Floating Models */}
             <FloatingMoltModels />
 
             <div className="absolute inset-0 pointer-events-none z-[1] opacity-30">
-                <LightRays raysColor="#ef4444" raysSpeed={0.5} />
+                <LightRays raysColor="#1a1a1a" raysSpeed={0.5} />
             </div>
 
             {/* Content Layer */}
@@ -164,17 +164,11 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                         {/* Logo/Brand */}
                         <div className="mb-12">
                             <div className="mb-6 flex justify-center">
-                                <img src={mainLogo} alt="MOLT RUNNER" className="w-24 h-24 drop-shadow-[0_0_20px_rgba(239,68,68,0.5)]" />
+                                <img src={mainLogo} alt="$WWR MADE BY WHITE WHALE DEV" className="w-24 h-24 drop-shadow-[0_0_20px_rgba(26,26,26,0.5)]" />
                             </div>
                             <h1 className="text-5xl font-black text-white mb-3 tracking-tighter uppercase italic">
-                                MOLT <span className="text-red-500">RUNNER</span>
+                                $WWR MADE BY WHITE WHALE DEV
                             </h1>
-                            <p className="text-zinc-400 text-lg font-medium">
-                                Join the underground mining revolution
-                            </p>
-                            <p className="mt-4 font-mono text-[10px] text-red-500/60 break-all select-all tracking-widest">
-                                9V1HMz3W833ypD9MuuMgwoEPEo1Mqii6aAVevbs8pump
-                            </p>
                         </div>
 
                         <div className="flex flex-col gap-4">
@@ -219,7 +213,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                     <div className="w-full max-w-2xl">
                         {/* Success Header */}
                         <div className="text-center mb-8">
-                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-red-600 shadow-[0_0_30px_rgba(220,38,38,0.4)] mb-6 transform rotate-3">
+                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-zinc-800 shadow-[0_0_30px_rgba(26,26,26,0.4)] mb-6 transform rotate-3">
                                 <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                 </svg>
@@ -230,7 +224,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
 
                         {/* Wallet Card */}
                         <div className="bg-zinc-900/40 backdrop-blur-3xl rounded-[2rem] border border-white/10 p-8 shadow-2xl relative">
-                            <div className="absolute inset-0 bg-red-500/5 rounded-[2rem] pointer-events-none" />
+                            <div className="absolute inset-0 bg-zinc-800/5 rounded-[2rem] pointer-events-none" />
 
                             {/* Public Key */}
                             <div className="mb-8 relative">
@@ -238,7 +232,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                                     Public Key
                                 </label>
                                 <div className="flex items-center gap-3">
-                                    <code className="flex-1 px-5 py-4 bg-black/40 rounded-2xl text-red-400 font-mono text-sm break-all border border-white/5">
+                                    <code className="flex-1 px-5 py-4 bg-black/40 rounded-2xl text-zinc-400 font-mono text-sm break-all border border-white/5">
                                         {generatedWallet.publicKey}
                                     </code>
                                     <button
@@ -261,11 +255,11 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
 
                             {/* Private Key */}
                             <div className="mb-8 relative">
-                                <label className="flex items-center gap-2 text-xs font-bold text-red-500 uppercase tracking-widest mb-3">
+                                <label className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">
                                     Private Key (Keep Secret!)
                                 </label>
                                 <div className="flex items-center gap-3">
-                                    <code className="flex-1 px-5 py-4 bg-black/40 rounded-2xl text-red-500 font-mono text-sm break-all border border-red-500/20">
+                                    <code className="flex-1 px-5 py-4 bg-black/40 rounded-2xl text-zinc-400 font-mono text-sm break-all border border-zinc-500/20">
                                         {showPrivateKey ? generatedWallet.privateKey : '•'.repeat(88)}
                                     </code>
                                     <div className="flex gap-2">
@@ -305,14 +299,14 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                             </div>
 
                             {/* Warning */}
-                            <div className="p-5 rounded-2xl bg-red-500/10 border border-red-500/20 mb-8 flex gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-red-500 flex items-center justify-center flex-shrink-0">
+                            <div className="p-5 rounded-2xl bg-zinc-800/10 border border-zinc-700/20 mb-8 flex gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-zinc-700 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
                                 </div>
                                 <div className="text-sm">
-                                    <p className="text-red-500 font-bold mb-1 uppercase tracking-tight">Security Alert</p>
+                                    <p className="text-zinc-400 font-bold mb-1 uppercase tracking-tight">Security Alert</p>
                                     <p className="text-zinc-400">Save your private key now. If you lose it, your funds are gone forever.</p>
                                 </div>
                             </div>
@@ -323,7 +317,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                                     type="checkbox"
                                     checked={hasBackedUp}
                                     onChange={(e) => setHasBackedUp(e.target.checked)}
-                                    className="w-6 h-6 rounded-lg border-white/10 bg-black text-red-600 focus:ring-red-600 focus:ring-offset-0"
+                                    className="w-6 h-6 rounded-lg border-white/10 bg-black text-zinc-600 focus:ring-zinc-600 focus:ring-offset-0"
                                 />
                                 <span className="text-sm text-zinc-300 font-medium">
                                     I have saved my private key securely

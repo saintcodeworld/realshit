@@ -156,8 +156,8 @@ const MinerControls: React.FC<MinerControlsProps> = ({
 
         {/* Withdrawal Status Messages */}
         {withdrawError && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-2 mt-2">
-            <p className="text-xs text-red-400 font-medium text-center">{withdrawError}</p>
+          <div className="bg-zinc-800/10 border border-zinc-700/30 rounded-lg p-2 mt-2">
+            <p className="text-xs text-zinc-400 font-medium text-center">{withdrawError}</p>
           </div>
         )}
         {withdrawSuccess && (

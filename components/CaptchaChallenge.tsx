@@ -7,6 +7,8 @@ interface CaptchaChallengeProps {
     onStart: () => void;
     onMilestone: (distance: number) => void;
     onGameOver?: (score: number) => void;
+    onScoreUpdate?: (score: number) => void;
+    onSessionRewardUpdate?: (reward: number) => void;
     isMining: boolean;
 }
 
@@ -20,7 +22,7 @@ const CHARACTER_SIZE = 120;
 const OBSTACLE_WIDTH = 25;
 const OBSTACLE_HEIGHT = 45;
 
-const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess, onStart, onMilestone, onGameOver, isMining }) => {
+const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess, onStart, onMilestone, onGameOver, onScoreUpdate, onSessionRewardUpdate, isMining }) => {
     const [difficulty, setDifficulty] = useState<CaptchaDifficulty>(CaptchaDifficulty.HARD);
     const [isExternalMining, setIsExternalMining] = useState(false); // Replaces 'loading' for UI state
     const [gameState, setGameState] = useState<'IDLE' | 'PLAYING' | 'GAME_OVER' | 'VICTORY'>('IDLE');
@@ -36,6 +38,35 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
     const [sessionReward, setSessionReward] = useState(0);
     const [rewardMessage, setRewardMessage] = useState<string | null>(null);
+
+    // Update parent component with score changes
+    useEffect(() => {
+        if (onScoreUpdate) {
+            onScoreUpdate(score);
+        }
+    }, [score, onScoreUpdate]);
+
+    // Update parent component with session reward changes
+    useEffect(() => {
+        if (onSessionRewardUpdate) {
+            onSessionRewardUpdate(sessionReward);
+        }
+    }, [sessionReward, onSessionRewardUpdate]);
+
+    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
+
+    useEffect(() => {
+        const handleResize = () => {
+            setCanvasSize({
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const requestRef = useRef<number>();
@@ -55,13 +86,18 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
     const lastDustSpawnRef = useRef(0);
     const heartsRef = useRef<{ x: number; y: number; speed: number; size: number; opacity: number; phase: number }[]>([]);
 
+    // Animation state
+    const animationRef = useRef({ frame: 0, frameTime: 0, jumpRotation: 0 });
+
     const startAudio = useRef<HTMLAudioElement | null>(null);
     const gameOverAudio = useRef<HTMLAudioElement | null>(null);
+    const jumpAudio = useRef<HTMLAudioElement | null>(null);
     const warningAudio = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
         startAudio.current = new Audio('/sounds/game-start.mp3');
         gameOverAudio.current = new Audio('/sounds/game-over.mp3');
+        jumpAudio.current = new Audio('/dist/sounds/whale sound.mp3');
 
         // Create warning beep using Web Audio API
         const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -161,6 +197,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             // Standard approach: Velocity is pixels/frame @ 60fps.
             p.dy = configRef.current.jumpStrength;
             p.grounded = false;
+            playSound(jumpAudio.current); // Play whale sound on jump
         }
     }, [gameState, initGame]);
 
@@ -174,7 +211,17 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             }
 
             keysPressed.current[e.code] = true;
-            if (e.code === 'Space' || e.code === 'ArrowUp') {
+            
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (gameState === 'IDLE') {
+                    onStart();
+                } else if (gameState === 'GAME_OVER') {
+                    initGame();
+                } else if (gameState === 'PLAYING') {
+                    jump();
+                }
+            } else if (e.code === 'ArrowUp' && gameState === 'PLAYING') {
                 e.preventDefault();
                 jump();
             }
@@ -189,7 +236,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [jump]);
+    }, [jump, gameState, onStart, initGame]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -223,10 +270,10 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
             // Update Character
             const p = characterRef.current;
+            
             if (isPlaying) {
                 // Variable Gravity
-                const isHoldingJump = keysPressed.current['Space'] || keysPressed.current['ArrowUp'];
-                const gravity = (p.dy < 0 && isHoldingJump) ? cfg.gravity * 0.5 : cfg.gravity;
+                const gravity = cfg.gravity;
 
                 p.dy += gravity * dt; // Scale gravity
                 p.y += p.dy * dt;     // Scale velocity application
@@ -378,50 +425,8 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
             // Drawing
             const drawBackground = () => {
-                // Red background gradient
-                const backgroundGradient = ctx.createLinearGradient(0, 0, 0, height);
-                backgroundGradient.addColorStop(0, '#991b1b'); // deep red
-                backgroundGradient.addColorStop(1, '#450a0a'); // even deeper red
-                ctx.fillStyle = backgroundGradient;
-                ctx.fillRect(0, 0, width, height);
-
-                // Draw Floating Hearts
-                heartsRef.current.forEach(heart => {
-                    heart.y -= heart.speed * dt;
-                    heart.x += Math.sin(heart.phase + Date.now() / 1000) * 0.5 * dt;
-
-                    if (heart.y < -heart.size) {
-                        heart.y = height + heart.size;
-                        heart.x = Math.random() * width;
-                    }
-
-                    ctx.save();
-                    ctx.globalAlpha = heart.opacity;
-                    ctx.fillStyle = '#ef4444'; // Bright red heart
-                    ctx.translate(heart.x, heart.y);
-
-                    const s = heart.size;
-                    const scale = 1 + Math.sin(heart.phase + Date.now() / 500) * 0.1; // Pulsing effect
-                    ctx.scale(scale, scale);
-
-                    ctx.beginPath();
-                    ctx.moveTo(0, s * 0.3);
-                    ctx.bezierCurveTo(0, 0, -s * 0.5, 0, -s * 0.5, s * 0.3);
-                    ctx.bezierCurveTo(-s * 0.5, s * 0.6, 0, s * 0.8, 0, s);
-                    ctx.bezierCurveTo(0, s * 0.8, s * 0.5, s * 0.6, s * 0.5, s * 0.3);
-                    ctx.bezierCurveTo(s * 0.5, 0, 0, 0, 0, s * 0.3);
-                    ctx.fill();
-                    ctx.restore();
-                });
-
-                // Draw background text
-                ctx.save();
-                ctx.font = 'bold 22px "JetBrains Mono"';
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; // Lowered opacity for text
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('9V1HMz3W833ypD9MuuMgwoEPEo1Mqii6aAVevbs8pump', width / 2, height / 2);
-                ctx.restore();
+                // Clear canvas with transparent background
+                ctx.clearRect(0, 0, width, height);
             };
 
             drawBackground();
@@ -480,7 +485,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                     ctx.fill();
                 }
 
-                // Draw Character sprite if loaded, fallback to simple shape
+                // Draw Character sprite
                 if (characterSpriteRef.current) {
                     ctx.drawImage(characterSpriteRef.current, 0, 0, size, size);
                 } else {
@@ -502,49 +507,20 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
                 ctx.fillRect(0, 0, width, height);
 
-                // Draw a sleek Start Button
-                const btnW = 240;
-                const btnH = 50;
-                const btnX = width / 2 - btnW / 2;
-                const btnY = height / 2 - btnH / 2;
-
-                // Button Shadow
-                ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.fillRect(btnX + 4, btnY + 4, btnW, btnH);
-
-                // Button Background (Red)
-                ctx.fillStyle = '#ef4444';
-                ctx.fillRect(btnX, btnY, btnW, btnH);
-
-                // Button Outline (Light Red)
-                ctx.strokeStyle = '#f87171';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(btnX, btnY, btnW, btnH);
-
-                ctx.font = 'bold 16px "JetBrains Mono"';
-                ctx.fillStyle = '#ffffff'; // White text
+                // Draw "Press Space to Start" text
+                ctx.font = 'bold 20px "JetBrains Mono"';
+                ctx.fillStyle = '#ffffff';
                 ctx.textAlign = 'center';
-                ctx.fillText('START GAME', width / 2, height / 2 + 6);
+                ctx.fillText('PRESS SPACE TO START', width / 2, height / 2 + 8);
             } else if (gameState === 'GAME_OVER') {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
                 ctx.fillRect(0, 0, width, height);
 
-                // Draw Restart Button
-                const btnW = 200;
-                const btnH = 50;
-                const btnX = width / 2 - btnW / 2;
-                const btnY = height / 2 - btnH / 2;
-
-                ctx.fillStyle = '#ef4444';
-                ctx.fillRect(btnX, btnY, btnW, btnH);
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(btnX, btnY, btnW, btnH);
-
+                // Draw "Press Space to Restart" text
                 ctx.font = 'bold 20px "JetBrains Mono"';
                 ctx.fillStyle = '#ffffff';
                 ctx.textAlign = 'center';
-                ctx.fillText('RESTART GAME', width / 2, height / 2 + 8);
+                ctx.fillText('PRESS SPACE TO RESTART', width / 2, height / 2 + 8);
             } else if (gameState === 'VICTORY') {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
                 ctx.fillRect(0, 0, width, height);
@@ -578,82 +554,48 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
         return () => {
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         };
-    }, [gameState, difficulty, onSuccess, onVerify, highScore]);
+    }, [gameState, difficulty, onSuccess, onVerify, highScore, canvasSize]);
 
 
 
     return (
-        <div className="bg-zinc-900/40 backdrop-blur-xl border border-zinc-100/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
-            {/* Subtle Glow Overlay */}
-            <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            {/* <div className="hidden">Difficulty Selector Removed</div> */}
+        <div className="relative w-full h-full">
+            <canvas
+                ref={canvasRef}
+                width={canvasSize.width}
+                height={canvasSize.height}
+                className={`w-full h-full bg-zinc-900 transition-all duration-300 cursor-pointer
+                    ${gameState === 'GAME_OVER' ? 'border-red-500/50' : gameState === 'VICTORY' ? 'border-green-500/50' : ''}
+                `}
+            />
 
-            <div className="mb-2 relative" onClick={jump}>
-                <canvas
-                    ref={canvasRef}
-                    width={800}
-                    height={500}
-                    className={`w-full h-auto rounded bg-zinc-900 border border-zinc-800 transition-all duration-300 cursor-pointer
-                        ${gameState === 'GAME_OVER' ? 'border-red-500/50' : gameState === 'VICTORY' ? 'border-green-500/50' : 'group-hover:border-white/50'}
-                    `}
-                />
-                <div className="absolute top-2 right-2 font-mono text-xs text-zinc-500">
-                    HI: {highScore}
-                </div>
-
-                {rewardMessage && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 animate-in zoom-in slide-in-from-bottom-5 duration-500">
-                        <div className="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-xl border border-green-500/50">
-                            <span className="text-xl font-black text-[#4ade80] drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] tracking-wider">
-                                {rewardMessage}
-                            </span>
-                        </div>
+            {rewardMessage && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 animate-in zoom-in slide-in-from-bottom-5 duration-500">
+                    <div className="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-xl border border-green-500/50">
+                        <span className="text-xl font-black text-[#4ade80] drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] tracking-wider">
+                            {rewardMessage}
+                        </span>
                     </div>
-                )}
-
-                {/* Volume Control Overlay */}
-                <div className="absolute top-2 left-2 z-20 flex items-center gap-2 bg-black/40 backdrop-blur px-2 py-1 rounded-lg border border-white/10" onClick={(e) => e.stopPropagation()}>
-                    <svg className="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                    </svg>
-                    <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.1"
-                        value={volume}
-                        onChange={(e) => setVolume(parseFloat(e.target.value))}
-                        className="w-16 h-1 bg-zinc-600 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-                    />
                 </div>
-            </div>
-            <div className="flex justify-between items-center px-1 mb-4">
-                <span className="text-[10px] uppercase tracking-widest text-zinc-400 font-bold">
-                    Distance: {Math.floor(score / 50)}m
-                </span>
-                <span className="text-[10px] uppercase tracking-widest text-[#22c55e] font-bold">
-                    Session Reward: {sessionReward.toFixed(4)} SOL
-                </span>
+            )}
+
+            {/* Volume Control Overlay */}
+            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/40 backdrop-blur px-2 py-1 rounded-lg border border-white/10" onClick={(e) => e.stopPropagation()}>
+                <svg className="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
+                <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={volume}
+                    onChange={(e) => setVolume(parseFloat(e.target.value))}
+                    className="w-16 h-1 bg-zinc-600 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                />
             </div>
 
-            {/* Hidden form to maintain layout if needed, or just info */}
-            <div className="space-y-4">
-                <button
-                    type="button"
-                    onClick={() => {
-                        if (gameState === 'PLAYING') {
-                            jump();
-                        } else if (gameState === 'GAME_OVER') {
-                            initGame();
-                        } else {
-                            onStart();
-                        }
-                    }}
-                    className={`neo-btn w-full ${gameState === 'PLAYING' ? 'neo-btn-secondary' : 'neo-btn-primary'}`}
-                >
-                    {gameState === 'PLAYING' ? 'JUMP' : gameState === 'GAME_OVER' ? 'RESTART GAME' : 'START GAME'}
-                </button>
-            </div>
+            {/* Game Info Overlay - Removed from canvas, now in Dashboard */}
         </div>
     );
 };

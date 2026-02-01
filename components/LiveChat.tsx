@@ -78,7 +78,7 @@ const LiveChat: React.FC<LiveChatProps> = ({ userAddress }) => {
             {/* Header */}
             <div className="p-4 border-b border-zinc-100/10 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-zinc-500'}`} />
                     <h3 className="text-white text-xs font-bold uppercase tracking-wider">
                         {isConnected ? 'Live Chat' : 'Connecting...'}
                     </h3>
@@ -115,7 +115,7 @@ const LiveChat: React.FC<LiveChatProps> = ({ userAddress }) => {
 
             {/* Error Popup */}
             {error && (
-                <div className="absolute bottom-20 left-4 right-4 bg-red-500/90 text-white text-[10px] font-bold uppercase p-2 rounded-lg text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="absolute bottom-20 left-4 right-4 bg-zinc-800/90 text-white text-[10px] font-bold uppercase p-2 rounded-lg text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
                     {error}
                 </div>
             )}

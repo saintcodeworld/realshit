@@ -63,10 +63,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, wallet }
                     {/* Private Key */}
                     <div>
                         <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 block">
-                            Private Key <span className="text-red-500">(KEEP SECRET)</span>
+                            Private Key <span className="text-zinc-500">(KEEP SECRET)</span>
                         </label>
                         <div className="bg-black/40 border border-zinc-700 rounded-lg p-3 flex items-center gap-3 relative">
-                            <code className={`flex-1 text-sm font-mono break-all ${showPrivateKey ? 'text-red-400' : 'text-zinc-600 blur-sm select-none'}`}>
+                            <code className={`flex-1 text-sm font-mono break-all ${showPrivateKey ? 'text-zinc-400' : 'text-zinc-600 blur-sm select-none'}`}>
                                 {showPrivateKey ? wallet.privateKey : '●'.repeat(48)}
                             </code>
                             <div className="flex items-center gap-1">

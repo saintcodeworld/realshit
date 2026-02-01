@@ -69,7 +69,7 @@ const App: React.FC = () => {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-zinc-950">
+      <div className="h-screen flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-4 border-white border-t-transparent rounded-full"></div>
       </div>
     );
@@ -82,17 +82,17 @@ const App: React.FC = () => {
 
   // Show dashboard if wallet exists
   return (
-    <div className="min-h-screen flex flex-col bg-[#0f0202] text-white selection:bg-red-500/30 relative">
-      {/* Dashboard Background */}
+    <div className="h-screen w-screen overflow-hidden text-white selection:bg-zinc-500/30 relative">
+      {/* Game Background - Full Screen */}
       <div
         className="absolute inset-0 z-0"
         style={{
-          backgroundColor: '#0f0202',
+          background: 'linear-gradient(145deg, #000000, #1a1a1a, #0a0a0a)',
         }}
       />
 
-      {/* Content Layer */}
-      <div className="relative z-10 flex flex-col h-full">
+      {/* Content Layer - Full Screen Overlay */}
+      <div className="relative z-10 h-full w-full flex flex-col">
 
         <SettingsModal
           isOpen={isSettingsOpen}
@@ -100,14 +100,8 @@ const App: React.FC = () => {
           wallet={wallet}
         />
 
-        <Header
-          status={status}
-          onLogout={handleLogout}
-          onSettingsClick={() => setIsSettingsOpen(true)}
-          onHowToPlayClick={() => setIsHowToPlayOpen(true)}
-        />
-
-        <main className="flex-1 container mx-auto px-4 py-6 max-w-[1600px] overflow-y-auto overflow-x-hidden">
+        {/* Main Game Area with UI Overlays */}
+        <main className="flex-1 relative">
           <Dashboard
             status={status}
             stats={stats}
@@ -120,6 +114,9 @@ const App: React.FC = () => {
             onSuccess={onSolveSuccess}
             onMilestone={onDistanceMilestone}
             onRequestWithdrawal={requestWithdrawal}
+            onLogout={handleLogout}
+            onSettingsClick={() => setIsSettingsOpen(true)}
+            onHowToPlayClick={() => setIsHowToPlayOpen(true)}
           />
         </main>
 
