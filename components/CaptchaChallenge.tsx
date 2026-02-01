@@ -89,31 +89,11 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
     // Animation state
     const animationRef = useRef({ frame: 0, frameTime: 0, jumpRotation: 0 });
 
-    const startAudio = useRef<HTMLAudioElement | null>(null);
-    const gameOverAudio = useRef<HTMLAudioElement | null>(null);
     const jumpAudio = useRef<HTMLAudioElement | null>(null);
-    const warningAudio = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
-        startAudio.current = new Audio('/sounds/game-start.mp3');
-        gameOverAudio.current = new Audio('/sounds/game-over.mp3');
+        // Load jump sound
         jumpAudio.current = new Audio('/dist/sounds/whale sound.mp3');
-
-        // Create warning beep using Web Audio API
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const createBeep = () => {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.frequency.value = 880; // High pitch warning
-            oscillator.type = 'square';
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.15);
-        };
-        (window as any).playWarningBeep = createBeep;
 
         // Load Character sprite
         const charImg = new Image();
@@ -173,7 +153,6 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
         setScore(0);
         setSessionReward(0);
         setGameState('PLAYING');
-        playSound(startAudio.current);
     }, [difficulty]);
 
     // ... (useEffect for mining/idle stays same)
@@ -346,17 +325,6 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                     }
                 }
 
-                // Warning beep system - Neuralink audio cue
-                obstaclesRef.current.forEach(obs => {
-                    // Play warning beep when obstacle is 250-300 pixels away
-                    if (!obs.warned && obs.x < p.x + 300 && obs.x > p.x + 200) {
-                        obs.warned = true;
-                        if ((window as any).playWarningBeep) {
-                            (window as any).playWarningBeep();
-                        }
-                    }
-                });
-
             }
 
             // Collision Detection
@@ -387,7 +355,6 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
                 if (crash) {
                     setGameState('GAME_OVER');
-                    playSound(gameOverAudio.current);
                     if (scoreRef.current > highScore) setHighScore(Math.floor(scoreRef.current));
                     if (onGameOver) onGameOver(scoreRef.current);
                     return; // Stop updating
@@ -579,22 +546,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 </div>
             )}
 
-            {/* Volume Control Overlay */}
-            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/40 backdrop-blur px-2 py-1 rounded-lg border border-white/10" onClick={(e) => e.stopPropagation()}>
-                <svg className="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                </svg>
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    value={volume}
-                    onChange={(e) => setVolume(parseFloat(e.target.value))}
-                    className="w-16 h-1 bg-zinc-600 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-                />
-            </div>
-
+            
             {/* Game Info Overlay - Removed from canvas, now in Dashboard */}
         </div>
     );

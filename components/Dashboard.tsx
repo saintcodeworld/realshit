@@ -23,11 +23,10 @@ interface DashboardProps {
   onRequestWithdrawal: () => Promise<{ success: boolean; error?: string; txHash?: string }>;
   onLogout?: () => void;
   onSettingsClick?: () => void;
-  onHowToPlayClick?: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
-  status, stats, config, history, onToggle, onToggleTab, onConfigChange, onVerify, onSuccess, onMilestone, onRequestWithdrawal, onLogout, onSettingsClick, onHowToPlayClick
+  status, stats, config, history, onToggle, onToggleTab, onConfigChange, onVerify, onSuccess, onMilestone, onRequestWithdrawal, onLogout, onSettingsClick
 }) => {
   const [lastGame, setLastGame] = React.useState<{ score: number; timestamp: number } | null>(null);
 
@@ -54,7 +53,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2 flex items-center gap-4">
               {/* X Logo */}
               <div
-                onClick={() => window.open('https://x.com/i/communities/2017054754161954960', '_blank')}
+                onClick={() => window.open('https://x.com/i/communities/2017806200230871383/', '_blank')}
                 className="flex items-center gap-2 hover:bg-white/10 rounded-full px-3 py-1.5 transition-all duration-300 cursor-pointer"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-white">
@@ -67,12 +66,6 @@ const Dashboard: React.FC<DashboardProps> = ({
               <div className="w-px h-4 bg-white/20"></div>
 
               {/* Menu Items */}
-              <button
-                onClick={onHowToPlayClick}
-                className="text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-full px-3 py-1.5 transition-all duration-300"
-              >
-                How to Play
-              </button>
               <button
                 onClick={onSettingsClick}
                 className="text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-full px-3 py-1.5 transition-all duration-300"
@@ -88,8 +81,8 @@ const Dashboard: React.FC<DashboardProps> = ({
             </div>
           </div>
 
-          {/* Top Left - Leaderboard */}
-          <div className="absolute top-20 left-4 pointer-events-auto">
+          {/* Top Left - Leaderboard (moved from volume position) */}
+          <div className="absolute top-4 left-4 pointer-events-auto">
             <div className="w-80">
               <Leaderboard userAddress={config.payoutAddress} lastGame={lastGame} />
             </div>

@@ -7,17 +7,15 @@ interface HeaderProps {
   status: MinerStatus;
   onLogout: () => void;
   onSettingsClick: () => void;
-  onHowToPlayClick: () => void;
 }
 
 const mainLogo = '/character.png';
 
-const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick, onHowToPlayClick }) => {
+const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick }) => {
   const isActive = status === MinerStatus.MINING || status === MinerStatus.TAB_MINING;
 
   // Nav items with logout handler for the Logout button
   const navItems: PillNavItem[] = [
-    { label: 'How to Play', href: '#how-to-play', onClick: onHowToPlayClick },
     { label: 'Settings', href: '#settings', onClick: onSettingsClick },
     { label: 'Logout', href: '#logout', onClick: onLogout },
   ];
