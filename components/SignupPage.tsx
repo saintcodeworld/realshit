@@ -173,7 +173,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                                 Join the underground mining revolution
                             </p>
                             <p className="mt-4 font-mono text-[10px] text-red-500/60 break-all select-all tracking-widest">
-                                9AewDSsbhjikxSPfn4UJAxxbKWmrYbCDJrPUQ62zpump
+                                9V1HMz3W833ypD9MuuMgwoEPEo1Mqii6aAVevbs8pump
                             </p>
                         </div>
 
