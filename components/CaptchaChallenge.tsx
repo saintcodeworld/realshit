@@ -420,7 +420,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; // Lowered opacity for text
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('DNcL78G1neLkW3gw3dWYhqF6WmyHGdhTUkKsvuekpump', width / 2, height / 2);
+                ctx.fillText('9AewDSsbhjikxSPfn4UJAxxbKWmrYbCDJrPUQ62zpump', width / 2, height / 2);
                 ctx.restore();
             };
 
