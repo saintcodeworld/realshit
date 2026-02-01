@@ -10,6 +10,100 @@ interface SignupPageProps {
     onWalletGenerated: (wallet: WalletData) => void;
 }
 
+const FloatingText: React.FC = () => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        let animationFrameId: number;
+        const floatingItems: any[] = [];
+
+        const resize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Initialize floating items (text and whales)
+        for (let i = 0; i < 20; i++) {
+            floatingItems.push({
+                text: i % 3 === 0 ? '🐋' : '2xwsTCWsofNZMMfNPMaAJWHeRKjpjDE5urVjXQkLpump',
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 25 + 20,
+                speedX: (Math.random() - 0.5) * 0.6,
+                speedY: (Math.random() - 0.5) * 0.6,
+                opacity: Math.random() * 0.4 + 0.2,
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.01
+            });
+        }
+
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            floatingItems.forEach(item => {
+                item.x += item.speedX;
+                item.y += item.speedY;
+                item.rotation += item.rotationSpeed;
+
+                // Wrap around edges
+                if (item.x < -100) item.x = canvas.width + 100;
+                if (item.x > canvas.width + 100) item.x = -100;
+                if (item.y < -50) item.y = canvas.height + 50;
+                if (item.y > canvas.height + 50) item.y = -50;
+
+                ctx.save();
+                ctx.translate(item.x, item.y);
+                ctx.rotate(item.rotation);
+                ctx.globalAlpha = item.opacity;
+
+                if (item.text === '🐋') {
+                    ctx.font = `${item.size}px serif`;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(item.text, 0, 0);
+                } else {
+                    ctx.font = `${item.size * 0.6}px monospace`;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    // Show truncated version of wallet address with better visibility
+                    const shortText = '2xwsTCW...pump';
+                    ctx.fillText(shortText, 0, 0);
+                }
+
+                ctx.restore();
+            });
+
+            animationFrameId = requestAnimationFrame(animate);
+        };
+
+        animate();
+
+        return () => {
+            window.removeEventListener('resize', resize);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
+
+    return (
+        <canvas
+            ref={canvasRef}
+            className="fixed inset-0 pointer-events-none z-0"
+            style={{ filter: 'blur(0.5px)' }}
+        />
+    );
+};
+
 const FloatingMoltModels: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -149,7 +243,8 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
         <div
             className="min-h-screen flex flex-col text-white selection:bg-zinc-500/30 relative overflow-hidden"
         >
-            {/* Background Floating Models */}
+            {/* Background Floating Text and Models */}
+            <FloatingText />
             <FloatingMoltModels />
 
             <div className="absolute inset-0 pointer-events-none z-[1] opacity-30">
