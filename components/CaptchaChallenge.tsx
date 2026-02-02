@@ -457,7 +457,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             ctx.font = 'bold 24px "JetBrains Mono"';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; // Slightly transparent to look like background
             ctx.textAlign = 'center';
-            ctx.fillText('Hitting obstacles makes jew become closer', width / 2, height / 2 - 40);
+            ctx.fillText('Hitting obstacles makes the jew come closer', width / 2, height / 2 - 40);
 
             // Draw Obstacles
             obstaclesRef.current.forEach(obs => {
