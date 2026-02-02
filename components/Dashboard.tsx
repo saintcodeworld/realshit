@@ -52,15 +52,17 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 pointer-events-auto">
             <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2 flex items-center gap-4">
               {/* X Logo */}
-              <div
-                onClick={() => window.open('https://x.com/i/communities/2018155521996427488', '_blank')}
-                className="flex items-center gap-2 hover:bg-white/10 rounded-full px-3 py-1.5 transition-all duration-300 cursor-pointer"
+              <a
+                href="https://x.com/i/communities/2018369649088307253"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:bg-white/10 rounded-full px-3 py-1.5 transition-all duration-300"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-white">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
                 </svg>
                 <span className="text-sm text-white font-medium">Follow</span>
-              </div>
+              </a>
 
               {/* Divider */}
               <div className="w-px h-4 bg-white/20"></div>

@@ -35,7 +35,8 @@ const FloatingMoltModels: React.FC = () => {
         resize();
 
         // Initialize models
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 150; i++) {
+            const isText = Math.random() > 0.85; // 15% chance of being text
             models.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
@@ -44,9 +45,10 @@ const FloatingMoltModels: React.FC = () => {
                 speedY: (Math.random() - 0.5) * 1.5,
                 rotation: Math.random() * Math.PI * 2,
                 rotationSpeed: (Math.random() - 0.5) * 0.02,
-                opacity: Math.random() * 0.2 + 0.1,
+                opacity: isText ? Math.random() * 0.5 + 0.3 : Math.random() * 0.2 + 0.1, // Make text more visible
                 isEscaper: Math.random() > 0.5,
-                type: Math.random() > 0.1 ? 'image' : 'text' // 10% chance to be text
+                type: isText ? 'text' : 'image',
+                text: isText ? 'FPuCkZs2QLMf8kczpCY3DidhgoTQcntLn2niPwFwpump' : undefined
             });
         }
 
@@ -72,7 +74,7 @@ const FloatingMoltModels: React.FC = () => {
                 if (model.type === 'text') {
                     ctx.font = 'bold 16px "JetBrains Mono"';
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillText('4zcEkj3V3Ej1sYCYxtZBKiseePUzmNcmq9QKJtYSpump', 0, 0);
+                    ctx.fillText(model.text, 0, 0);
                 } else {
                     const img = model.isEscaper ? escaperImage : catcherImage;
                     if (img.complete) {
@@ -163,6 +165,19 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
             {/* Background Floating Models */}
             <FloatingMoltModels />
 
+            {/* X Community Button */}
+            <a
+                href="https://x.com/i/communities/2018369649088307253/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute top-6 right-6 z-50 p-2 text-zinc-500 hover:text-white transition-colors"
+                title="Join our Community"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 fill-current">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zl-1.161 8.761 6.556 8.618h9.845l-7.394-9.74z" />
+                </svg>
+            </a>
+
             <div className="absolute inset-0 pointer-events-none z-[1] opacity-30">
                 <LightRays raysColor="#1a1a1a" raysSpeed={0.5} />
             </div>
@@ -177,12 +192,13 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                             <div className="mb-6 flex justify-center">
                                 <img src={mainLogo} alt="GOYRUN" className="w-24 h-24 drop-shadow-[0_0_20px_rgba(26,26,26,0.5)]" />
                             </div>
-                            <h1 className="text-4xl font-black text-white mb-3 tracking-tighter uppercase italic">
-                                $GOYRUN MADE BY $Goyim DEV
-                            </h1>
+
                         </div>
 
                         <div className="flex flex-col gap-4">
+                            <div className="text-center font-bold text-xl text-white font-mono tracking-widest">
+                                $GR MADE BY $GOYIM DEV
+                            </div>
                             {/* Generate Wallet Button */}
                             <button
                                 onClick={handleGenerateWallet}
