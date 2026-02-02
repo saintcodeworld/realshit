@@ -132,11 +132,6 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
     }, []);
 
     const playSound = (audio: HTMLAudioElement | null) => {
-        if (audio) {
-            audio.volume = volume;
-            audio.currentTime = 0;
-            audio.play().catch(e => console.error("Sound play failed:", e));
-        }
     };
 
     // Frame Rate Independence
@@ -176,7 +171,6 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             // Standard approach: Velocity is pixels/frame @ 60fps.
             p.dy = configRef.current.jumpStrength;
             p.grounded = false;
-            playSound(jumpAudio.current); // Play whale sound on jump
         }
     }, [gameState, initGame]);
 
@@ -190,7 +184,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             }
 
             keysPressed.current[e.code] = true;
-            
+
             if (e.code === 'Space') {
                 e.preventDefault();
                 if (gameState === 'IDLE') {
@@ -249,7 +243,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
             // Update Character
             const p = characterRef.current;
-            
+
             if (isPlaying) {
                 // Variable Gravity
                 const gravity = cfg.gravity;
@@ -546,7 +540,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 </div>
             )}
 
-            
+
             {/* Game Info Overlay - Removed from canvas, now in Dashboard */}
         </div>
     );

@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick }) =>
         <div className="flex items-center justify-center">
           <PillNav
             logo={mainLogo}
-            logoAlt="$WWR MADE BY WHITE WHALE DEV"
+            logoAlt="$GMR MADE BY GOYIM DEV"
             items={navItems}
             activeHref="#dashboard"
             baseColor="linear-gradient(145deg, #2e2d2d, #212121)"

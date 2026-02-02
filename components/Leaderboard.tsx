@@ -64,7 +64,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ userAddress, lastGame }) => {
 
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-bold text-white uppercase tracking-wider">Top Whales</h4>
+                    <h4 className="text-sm font-bold text-white uppercase tracking-wider">Top Goyim</h4>
                 </div>
             </div>
 
