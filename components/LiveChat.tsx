@@ -13,8 +13,11 @@ interface LiveChatProps {
     userAddress: string;
 }
 
-// Fallback to current host if VITE_API_URL is not set
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// Only use localhost fallback if we are actually running on localhost
+const isLocal = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+const SOCKET_URL = import.meta.env.VITE_API_URL || (isLocal ? 'http://localhost:3001' : '');
 
 const LiveChat: React.FC<LiveChatProps> = ({ userAddress }) => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -25,6 +28,8 @@ const LiveChat: React.FC<LiveChatProps> = ({ userAddress }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        if (!SOCKET_URL) return;
+
         const newSocket = io(SOCKET_URL, {
             reconnectionAttempts: 5,
             reconnectionDelay: 2000,

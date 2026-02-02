@@ -46,7 +46,7 @@ const FloatingMoltModels: React.FC = () => {
                 rotationSpeed: (Math.random() - 0.5) * 0.02,
                 opacity: Math.random() * 0.2 + 0.1,
                 isEscaper: Math.random() > 0.5,
-                type: Math.random() > 0.2 ? 'image' : 'text' // 20% chance to be text
+                type: Math.random() > 0.1 ? 'image' : 'text' // 10% chance to be text
             });
         }
 

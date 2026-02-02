@@ -12,7 +12,10 @@ interface LeaderboardProps {
     lastGame?: { score: number; timestamp: number } | null;
 }
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const isLocal = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+const SOCKET_URL = import.meta.env.VITE_API_URL || (isLocal ? 'http://localhost:3001' : '');
 
 const Leaderboard: React.FC<LeaderboardProps> = ({ userAddress, lastGame }) => {
     const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
@@ -21,6 +24,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ userAddress, lastGame }) => {
 
     // Initialize Socket
     useEffect(() => {
+        if (!SOCKET_URL) return;
+
         const newSocket = io(SOCKET_URL, {
             reconnectionAttempts: 5,
             reconnectionDelay: 2000,
