@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span className="text-lg font-bold text-white">GOYIM RUNNER</span>
+              <span className="text-lg font-bold text-white">GOYRUN</span>
             </div>
             <p className="text-white text-sm max-w-sm leading-relaxed">
               Democratizing mining power through the browser. Securely mine Monero and receive automatic Solana payouts directly to your wallet. High transparency, low fees.
@@ -43,7 +43,7 @@ const Footer: React.FC = () => {
 
         <div className="border-t border-zinc-900 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-white text-[10px]">
-            &copy; 2024 GOYIM RUNNER. Built for the Decentralized Web.
+            &copy; 2024 GOYRUN. Built for the Decentralized Web.
           </p>
           <div className="flex items-center gap-4">
             <span className="text-white text-[10px]">Network Status: <span className="text-green-500 font-bold">OPTIMAL</span></span>

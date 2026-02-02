@@ -4,7 +4,7 @@ import LightRays from './LightRays';
 import SignInModal from './SignInModal';
 import { generateSolanaWallet, saveWalletToStorage, WalletData } from '../utils/solanaWallet';
 
-const mainLogo = '/character.png';
+const mainLogo = '/chaser.png';
 
 interface SignupPageProps {
     onWalletGenerated: (wallet: WalletData) => void;
@@ -21,8 +21,10 @@ const FloatingMoltModels: React.FC = () => {
 
         let animationFrameId: number;
         const models: any[] = [];
-        const modelImage = new Image();
-        modelImage.src = mainLogo;
+        const escaperImage = new Image();
+        escaperImage.src = '/chaser.png';
+        const catcherImage = new Image();
+        catcherImage.src = '/character.png';
 
         const resize = () => {
             canvas.width = window.innerWidth;
@@ -42,7 +44,8 @@ const FloatingMoltModels: React.FC = () => {
                 speedY: (Math.random() - 0.5) * 1.5,
                 rotation: Math.random() * Math.PI * 2,
                 rotationSpeed: (Math.random() - 0.5) * 0.02,
-                opacity: Math.random() * 0.2 + 0.1
+                opacity: Math.random() * 0.2 + 0.1,
+                isEscaper: Math.random() > 0.5
             });
         }
 
@@ -65,8 +68,9 @@ const FloatingMoltModels: React.FC = () => {
                 ctx.rotate(model.rotation);
                 ctx.globalAlpha = model.opacity;
 
-                if (modelImage.complete) {
-                    ctx.drawImage(modelImage, -model.size / 2, -model.size / 2, model.size, model.size);
+                const img = model.isEscaper ? escaperImage : catcherImage;
+                if (img.complete) {
+                    ctx.drawImage(img, -model.size / 2, -model.size / 2, model.size, model.size);
                 } else {
                     ctx.fillStyle = '#1a1a1a';
                     ctx.beginPath();
@@ -164,10 +168,10 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                         {/* Logo/Brand */}
                         <div className="mb-12">
                             <div className="mb-6 flex justify-center">
-                                <img src={mainLogo} alt="$GMR MADE BY GOYIM DEV" className="w-24 h-24 drop-shadow-[0_0_20px_rgba(26,26,26,0.5)]" />
+                                <img src={mainLogo} alt="GOYRUN" className="w-24 h-24 drop-shadow-[0_0_20px_rgba(26,26,26,0.5)]" />
                             </div>
                             <h1 className="text-5xl font-black text-white mb-3 tracking-tighter uppercase italic">
-                                $GMR MADE BY GOYIM DEV
+                                GOYRUN
                             </h1>
                         </div>
 

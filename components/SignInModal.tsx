@@ -139,7 +139,7 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSignIn }) 
                                 <div>
                                     <p className="text-red-400 font-medium mb-1">Security Notice</p>
                                     <p className="text-red-300/80 text-sm">
-                                        Make sure you're on the official GOYIM RUNNER website. Never enter your private key on untrusted sites.
+                                        Make sure you're on the official GOYRUN website. Never enter your private key on untrusted sites.
                                     </p>
                                 </div>
                             </div>

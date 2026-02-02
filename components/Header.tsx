@@ -9,7 +9,7 @@ interface HeaderProps {
   onSettingsClick: () => void;
 }
 
-const mainLogo = '/character.png';
+const mainLogo = '/chaser.png';
 
 const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick }) => {
   const isActive = status === MinerStatus.MINING || status === MinerStatus.TAB_MINING;
@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ status, onLogout, onSettingsClick }) =>
         <div className="flex items-center justify-center">
           <PillNav
             logo={mainLogo}
-            logoAlt="$GMR MADE BY GOYIM DEV"
+            logoAlt="GOYRUN"
             items={navItems}
             activeHref="#dashboard"
             baseColor="linear-gradient(145deg, #2e2d2d, #212121)"
