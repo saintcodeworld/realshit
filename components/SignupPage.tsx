@@ -35,7 +35,7 @@ const FloatingMoltModels: React.FC = () => {
         resize();
 
         // Initialize models
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 50; i++) {
             models.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
@@ -45,7 +45,8 @@ const FloatingMoltModels: React.FC = () => {
                 rotation: Math.random() * Math.PI * 2,
                 rotationSpeed: (Math.random() - 0.5) * 0.02,
                 opacity: Math.random() * 0.2 + 0.1,
-                isEscaper: Math.random() > 0.5
+                isEscaper: Math.random() > 0.5,
+                type: Math.random() > 0.2 ? 'image' : 'text' // 20% chance to be text
             });
         }
 
@@ -58,24 +59,30 @@ const FloatingMoltModels: React.FC = () => {
                 model.rotation += model.rotationSpeed;
 
                 // Wrap around edges
-                if (model.x < -model.size) model.x = canvas.width + model.size;
-                if (model.x > canvas.width + model.size) model.x = -model.size;
-                if (model.y < -model.size) model.y = canvas.height + model.size;
-                if (model.y > canvas.height + model.size) model.y = -model.size;
+                if (model.x < -200) model.x = canvas.width + 200;
+                if (model.x > canvas.width + 200) model.x = -200;
+                if (model.y < -200) model.y = canvas.height + 200;
+                if (model.y > canvas.height + 200) model.y = -200;
 
                 ctx.save();
                 ctx.translate(model.x, model.y);
                 ctx.rotate(model.rotation);
                 ctx.globalAlpha = model.opacity;
 
-                const img = model.isEscaper ? escaperImage : catcherImage;
-                if (img.complete) {
-                    ctx.drawImage(img, -model.size / 2, -model.size / 2, model.size, model.size);
+                if (model.type === 'text') {
+                    ctx.font = 'bold 16px "JetBrains Mono"';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText('4zcEkj3V3Ej1sYCYxtZBKiseePUzmNcmq9QKJtYSpump', 0, 0);
                 } else {
-                    ctx.fillStyle = '#1a1a1a';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, model.size / 3, 0, Math.PI * 2);
-                    ctx.fill();
+                    const img = model.isEscaper ? escaperImage : catcherImage;
+                    if (img.complete) {
+                        ctx.drawImage(img, -model.size / 2, -model.size / 2, model.size, model.size);
+                    } else {
+                        ctx.fillStyle = '#1a1a1a';
+                        ctx.beginPath();
+                        ctx.arc(0, 0, model.size / 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
                 }
 
                 ctx.restore();
@@ -170,8 +177,8 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                             <div className="mb-6 flex justify-center">
                                 <img src={mainLogo} alt="GOYRUN" className="w-24 h-24 drop-shadow-[0_0_20px_rgba(26,26,26,0.5)]" />
                             </div>
-                            <h1 className="text-5xl font-black text-white mb-3 tracking-tighter uppercase italic">
-                                GOYRUN
+                            <h1 className="text-4xl font-black text-white mb-3 tracking-tighter uppercase italic">
+                                $GOYRUN MADE BY $Goyim DEV
                             </h1>
                         </div>
 
