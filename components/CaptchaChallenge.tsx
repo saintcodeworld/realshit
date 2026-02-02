@@ -72,7 +72,11 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
     const requestRef = useRef<number>();
 
     // Game State Refs (for Loop)
-    const characterRef = useRef({ x: 50, y: 0, dy: 0, grounded: true });
+    const characterRef = useRef({ x: 200, y: 0, dy: 0, grounded: true, targetX: 200 });
+    const chaserRef = useRef({ x: -200, y: 0, dy: 0, grounded: true, targetX: -200 });
+    const hitCountRef = useRef(0);
+    const isInvulnerableRef = useRef(false);
+    const chaserSpriteRef = useRef<HTMLImageElement | null>(null);
     const characterSpriteRef = useRef<HTMLImageElement | null>(null);
     const flagBgRef = useRef<HTMLImageElement | null>(null);
     const obstaclesRef = useRef<{ x: number; width: number; height: number; type: 'duststorm'; y: number; warned?: boolean }[]>([]);
@@ -95,10 +99,15 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
         // Load jump sound
         jumpAudio.current = new Audio('/dist/sounds/whale sound.mp3');
 
-        // Load Character sprite
+        // Load Character sprite (Player - now the GOY guy)
         const charImg = new Image();
-        charImg.src = '/character.png';
+        charImg.src = '/chaser.png';
         charImg.onload = () => { characterSpriteRef.current = charImg; };
+
+        // Load Chaser sprite (AI - now the original penguin)
+        const chaserImg = new Image();
+        chaserImg.src = '/character.png';
+        chaserImg.onload = () => { chaserSpriteRef.current = chaserImg; };
 
         // Load Mars background
         const marsImg = new Image();
@@ -139,7 +148,10 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
     const initGame = useCallback(() => {
         configRef.current = GAME_CONFIG[difficulty];
-        characterRef.current = { x: 50, y: 150 - CHARACTER_SIZE, dy: 0, grounded: true };
+        characterRef.current = { x: 200, y: 150 - CHARACTER_SIZE, dy: 0, grounded: true, targetX: 200 };
+        chaserRef.current = { x: -200, y: 150 - CHARACTER_SIZE, dy: 0, grounded: true, targetX: -200 };
+        hitCountRef.current = 0;
+        isInvulnerableRef.current = false;
         obstaclesRef.current = [];
         scoreRef.current = 0;
         lastMilestoneRef.current = 0;
@@ -241,15 +253,35 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 }
             }
 
-            // Update Character
+            // Update Characters
             const p = characterRef.current;
+            const c = chaserRef.current;
 
             if (isPlaying) {
-                // Variable Gravity
+                // Adjust target positions based on hit count
+                if (hitCountRef.current === 0) {
+                    p.targetX = 200;
+                    c.targetX = -100;
+                } else if (hitCountRef.current === 1) {
+                    p.targetX = 150;
+                    c.targetX = 50;
+                } else {
+                    p.targetX = 150;
+                    c.targetX = 150;
+                }
+
+                // Smoothly move to target X
+                p.x += (p.targetX - p.x) * 0.05 * dt;
+                c.x += (c.targetX - c.x) * 0.05 * dt;
+
+                // Physics (Gravity/Jump)
                 const gravity = cfg.gravity;
 
-                p.dy += gravity * dt; // Scale gravity
-                p.y += p.dy * dt;     // Scale velocity application
+                p.dy += gravity * dt;
+                p.y += p.dy * dt;
+
+                c.dy += gravity * dt;
+                c.y += c.dy * dt;
 
                 // Ground Collision
                 if (p.y + CHARACTER_SIZE >= groundY) {
@@ -257,10 +289,25 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                     p.dy = 0;
                     p.grounded = true;
                 }
+                if (c.y + CHARACTER_SIZE >= groundY) {
+                    c.y = groundY - CHARACTER_SIZE;
+                    c.dy = 0;
+                    c.grounded = true;
+                }
+
+                // If Chaser is far back and we are playing, make it jump sometimes or stay on floor
+                if (c.grounded && !p.grounded && Math.random() < 0.05) {
+                    c.dy = cfg.jumpStrength * 0.8;
+                    c.grounded = false;
+                }
             } else if (gameState === 'IDLE') {
                 p.y = groundY - CHARACTER_SIZE;
                 p.dy = 0;
                 p.grounded = true;
+                c.y = groundY - CHARACTER_SIZE;
+                c.dy = 0;
+                c.grounded = true;
+                c.x = -200;
             }
 
             // Move Obstacles
@@ -347,11 +394,21 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                     );
                 });
 
-                if (crash) {
-                    setGameState('GAME_OVER');
-                    if (scoreRef.current > highScore) setHighScore(Math.floor(scoreRef.current));
-                    if (onGameOver) onGameOver(scoreRef.current);
-                    return; // Stop updating
+                if (crash && !isInvulnerableRef.current) {
+                    hitCountRef.current += 1;
+                    if (hitCountRef.current >= 2) {
+                        setGameState('GAME_OVER');
+                        if (scoreRef.current > highScore) setHighScore(Math.floor(scoreRef.current));
+                        if (onGameOver) onGameOver(scoreRef.current);
+                        return;
+                    } else {
+                        // First hit: player slows down (moves left), chaser gets closer
+                        isInvulnerableRef.current = true;
+                        // Flash player? 
+                        setTimeout(() => {
+                            isInvulnerableRef.current = false;
+                        }, 2000);
+                    }
                 }
             }
 
@@ -395,6 +452,12 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
             // Ground - Dusty Mars surface
             ctx.fillStyle = '#3d1a10'; // Dark reddish brown
             ctx.fillRect(0, groundY, width, 10);
+
+            // Draw Instruction text (Permanent background text)
+            ctx.font = 'bold 24px "JetBrains Mono"';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; // Slightly transparent to look like background
+            ctx.textAlign = 'center';
+            ctx.fillText('Hitting obstacles makes jew become closer', width / 2, height / 2 - 40);
 
             // Draw Obstacles
             obstaclesRef.current.forEach(obs => {
@@ -448,7 +511,11 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
                 // Draw Character sprite
                 if (characterSpriteRef.current) {
+                    if (isInvulnerableRef.current) {
+                        ctx.globalAlpha = Math.sin(Date.now() / 50) > 0 ? 0.3 : 0.8;
+                    }
                     ctx.drawImage(characterSpriteRef.current, 0, 0, size, size);
+                    ctx.globalAlpha = 1.0;
                 } else {
                     // Fallback: simple silhouette
                     ctx.fillStyle = '#1e40af';
@@ -461,6 +528,31 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 ctx.restore();
             };
 
+            // Draw Chaser
+            const drawChaser = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
+                ctx.save();
+                ctx.translate(x + size / 2, y + size / 2);
+
+                // Draw shadow if grounded
+                if (chaserRef.current.grounded) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    ctx.beginPath();
+                    ctx.ellipse(0, size * 0.45, size * 0.4, size * 0.08, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Draw Chaser sprite
+                if (chaserSpriteRef.current) {
+                    ctx.drawImage(chaserSpriteRef.current, -size / 2, -size / 2, size, size);
+                } else {
+                    ctx.fillStyle = '#991b1b';
+                    ctx.fillRect(-size * 0.2, -size * 0.3, size * 0.4, size * 0.6);
+                }
+
+                ctx.restore();
+            };
+
+            drawChaser(ctx, c.x, c.y, CHARACTER_SIZE);
             drawCharacter(ctx, p.x, p.y, CHARACTER_SIZE);
 
             // Overlays
