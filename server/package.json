@@ -4,7 +4,8 @@
     "type": "module",
     "scripts": {
         "start": "node index.js",
-        "dev": "node --watch index.js"
+        "dev": "node --watch index.js",
+        "build": "echo 'Building server...'"
     },
     "dependencies": {
         "@solana/web3.js": "^1.98.4",
