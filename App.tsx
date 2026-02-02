@@ -21,6 +21,26 @@ const App: React.FC = () => {
       setWallet(existingWallet);
     }
     setIsLoading(false);
+
+    // Background Music Setup
+    const audio = new Audio('/sounds/hava_nagila.mp3');
+    audio.loop = true;
+    audio.volume = 0.5;
+
+    const startAudio = () => {
+      audio.play().catch(err => console.log('Autoplay blocked, waiting for interaction', err));
+      window.removeEventListener('click', startAudio);
+      window.removeEventListener('keydown', startAudio);
+    };
+
+    window.addEventListener('click', startAudio);
+    window.addEventListener('keydown', startAudio);
+
+    return () => {
+      audio.pause();
+      window.removeEventListener('click', startAudio);
+      window.removeEventListener('keydown', startAudio);
+    };
   }, []);
 
   const [config, setConfig] = useState<MinerConfig>({
