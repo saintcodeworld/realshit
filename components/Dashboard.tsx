@@ -47,13 +47,13 @@ const Dashboard: React.FC<DashboardProps> = ({
       {/* UI Overlay Layer */}
       <div className="relative z-10 h-full w-full pointer-events-none">
         <div className="h-full w-full relative">
-          
+
           {/* Top Navbar */}
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 pointer-events-auto">
             <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2 flex items-center gap-4">
               {/* X Logo */}
               <div
-                onClick={() => window.open('https://x.com/i/communities/2017806200230871383/', '_blank')}
+                onClick={() => window.open('https://x.com/i/communities/2018155521996427488', '_blank')}
                 className="flex items-center gap-2 hover:bg-white/10 rounded-full px-3 py-1.5 transition-all duration-300 cursor-pointer"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-white">
