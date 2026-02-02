@@ -80,6 +80,8 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
     const characterSpriteRef = useRef<HTMLImageElement | null>(null);
     const flagBgRef = useRef<HTMLImageElement | null>(null);
     const obstaclesRef = useRef<{ x: number; width: number; height: number; type: 'duststorm'; y: number; warned?: boolean }[]>([]);
+    const tokensRef = useRef<{ x: number; y: number; width: number; height: number; collected: boolean; floatOffset: number }[]>([]);
+    const tokenSpriteRef = useRef<HTMLImageElement | null>(null);
     const scoreRef = useRef(0);
     const lastMilestoneRef = useRef(0);
     const speedRef = useRef(0);
@@ -113,6 +115,11 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
         const marsImg = new Image();
         marsImg.src = '/mars_background.png';
         marsImg.onload = () => { flagBgRef.current = marsImg; };
+
+        // Load Token sprite
+        const tokenImg = new Image();
+        tokenImg.src = '/token.png';
+        tokenImg.onload = () => { tokenSpriteRef.current = tokenImg; };
 
         // Initialize dust particles
         const particles = [];
@@ -153,6 +160,7 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
         hitCountRef.current = 0;
         isInvulnerableRef.current = false;
         obstaclesRef.current = [];
+        tokensRef.current = [];
         scoreRef.current = 0;
         lastMilestoneRef.current = 0;
         speedRef.current = configRef.current.speed;
@@ -321,6 +329,19 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                 }
             }
 
+            // Move Tokens
+            if (isPlaying) {
+                tokensRef.current.forEach(token => {
+                    const moveSpeed = speedRef.current;
+                    token.x -= moveSpeed * dt;
+                });
+                // Remove off-screen or collected tokens
+                if (tokensRef.current.length > 0 && tokensRef.current[0].x < -50) {
+                    tokensRef.current.shift();
+                }
+                tokensRef.current = tokensRef.current.filter(t => !t.collected && t.x > -100);
+            }
+
             // Obstacle Spawning relies on distance, which relies on Score.
             // Score usually increments by speed. 
             if (isPlaying) {
@@ -368,6 +389,30 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
 
             }
 
+            // Token Spawning Logic
+            // Spawn randomly, but ensure not inside an obstacle
+            if (isPlaying && Math.random() < 0.02) { // 2% chance per frame
+                const lastToken = tokensRef.current[tokensRef.current.length - 1];
+                const minTokenGap = 300; // Minimum distance between tokens
+
+                if (!lastToken || (width - lastToken.x > minTokenGap)) {
+                    // Check if we are overlapping an obstacle
+                    const safeToSpawn = !obstaclesRef.current.some(obs => Math.abs(obs.x - width) < 100);
+
+                    if (safeToSpawn) {
+                        const tokenY = groundY - 110 - (Math.random() * 50); // Lowered
+                        tokensRef.current.push({
+                            x: width,
+                            y: tokenY,
+                            width: 80,
+                            height: 80,
+                            collected: false,
+                            floatOffset: Math.random() * Math.PI * 2
+                        });
+                    }
+                }
+            }
+
             // Collision Detection
             if (isPlaying) {
                 const hitMargin = CHARACTER_SIZE * 0.2; // 20% forgiveness
@@ -410,6 +455,30 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                         }, 2000);
                     }
                 }
+            }
+
+            // Token Collision Detection
+            if (isPlaying) {
+                tokensRef.current.forEach(token => {
+                    if (token.collected) return;
+
+                    const p = characterRef.current;
+                    const hitMargin = 10;
+
+                    if (
+                        p.x + hitMargin < token.x + token.width &&
+                        p.x + CHARACTER_SIZE - hitMargin > token.x &&
+                        p.y + hitMargin < token.y + token.height &&
+                        p.y + CHARACTER_SIZE - hitMargin > token.y
+                    ) {
+                        token.collected = true;
+                        // Award points and SOL
+                        scoreRef.current += 100; // Bonus points
+                        setSessionReward(prev => prev + 0.0001); // Bonus SOL
+                        setRewardMessage('+0.0001 SOL');
+                        setTimeout(() => setRewardMessage(null), 1000);
+                    }
+                });
             }
 
             // Update Score
@@ -490,6 +559,23 @@ const CaptchaChallenge: React.FC<CaptchaChallengeProps> = ({ onVerify, onSuccess
                     ctx.stroke();
 
                     ctx.restore();
+                }
+            });
+
+            // Draw Tokens
+            tokensRef.current.forEach(token => {
+                if (token.collected) return;
+
+                const hoverY = Math.sin(Date.now() / 200 + token.floatOffset) * 5;
+
+                if (tokenSpriteRef.current) {
+                    ctx.drawImage(tokenSpriteRef.current, token.x, token.y + hoverY, token.width, token.height);
+                } else {
+                    // Fallback
+                    ctx.fillStyle = '#FFD700';
+                    ctx.beginPath();
+                    ctx.arc(token.x + token.width / 2, token.y + token.height / 2 + hoverY, token.width / 2, 0, Math.PI * 2);
+                    ctx.fill();
                 }
             });
 
