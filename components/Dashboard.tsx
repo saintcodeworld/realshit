@@ -53,7 +53,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2 flex items-center gap-4">
               {/* X Logo */}
               <a
-                href="https://x.com/i/communities/2018369649088307253"
+                href="https://x.com/i/communities/2018739473429811480/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:bg-white/10 rounded-full px-3 py-1.5 transition-all duration-300"

@@ -36,7 +36,7 @@ const FloatingMoltModels: React.FC = () => {
 
         // Initialize models
         for (let i = 0; i < 150; i++) {
-            const isText = Math.random() > 0.85; // 15% chance of being text
+            const isText = Math.random() > 0.925; // 7.5% chance of being text
             models.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
@@ -48,7 +48,7 @@ const FloatingMoltModels: React.FC = () => {
                 opacity: isText ? Math.random() * 0.5 + 0.3 : Math.random() * 0.2 + 0.1, // Make text more visible
                 isEscaper: Math.random() > 0.5,
                 type: isText ? 'text' : 'image',
-                text: isText ? 'FPuCkZs2QLMf8kczpCY3DidhgoTQcntLn2niPwFwpump' : undefined
+                text: isText ? '2PFzidgk9pbLxbdcDQZkBiKmfaCW5WE7Bwfpohpxpump' : undefined
             });
         }
 
@@ -72,7 +72,7 @@ const FloatingMoltModels: React.FC = () => {
                 ctx.globalAlpha = model.opacity;
 
                 if (model.type === 'text') {
-                    ctx.font = 'bold 16px "JetBrains Mono"';
+                    ctx.font = 'bold 10px "JetBrains Mono"';
                     ctx.fillStyle = '#ffffff';
                     ctx.fillText(model.text, 0, 0);
                 } else {
@@ -167,7 +167,7 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
 
             {/* X Community Button */}
             <a
-                href="https://x.com/i/communities/2018369649088307253/"
+                href="https://x.com/i/communities/2018739473429811480/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="absolute top-6 right-6 z-50 p-2 text-zinc-500 hover:text-white transition-colors"
@@ -189,10 +189,10 @@ const SignupPage: React.FC<SignupPageProps> = ({ onWalletGenerated }) => {
                     <div className="text-center max-w-lg w-full">
                         {/* Logo/Brand */}
                         <div className="mb-12">
-                            <div className="mb-6 flex justify-center">
-                                <img src={mainLogo} alt="GOYRUN" className="w-24 h-24 drop-shadow-[0_0_20px_rgba(26,26,26,0.5)]" />
+                            <div className="mb-6 flex justify-center items-center gap-4">
+                                <img src="/character.png" alt="Character" className="w-24 h-24 drop-shadow-[0_0_20px_rgba(26,26,26,0.5)] transform -rotate-6 hover:rotate-0 transition-transform duration-300" />
+                                <img src="/chaser.png" alt="Chaser" className="w-24 h-24 drop-shadow-[0_0_20px_rgba(26,26,26,0.5)] transform rotate-6 hover:rotate-0 transition-transform duration-300" />
                             </div>
-
                         </div>
 
                         <div className="flex flex-col gap-4">
